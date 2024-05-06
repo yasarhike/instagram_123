@@ -1,6 +1,8 @@
 package org.insta.content.controller.post.like;
 
 import org.insta.content.dao.post.like.PostLikeDAOImpl;
+import org.insta.content.service.post.like.PostLikeService;
+import org.insta.content.service.post.like.PostLikeServiceImpl;
 import org.insta.wrapper.jsonvalidator.ObjectValidator;
 
 import javax.ws.rs.*;
@@ -8,25 +10,22 @@ import javax.ws.rs.core.MediaType;
 
 /**
  * <p>
- *     Manages post likes.
+ * Manages post likes.
  * </p>
- *
- * @see PostLikeDAOImpl
- * @see ObjectValidator
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see PostLikeDAOImpl
+ * @see ObjectValidator
  */
-@Path("/postslike")
+@Path("/postlike")
 public final class PostLikeControllerRest {
 
     private static PostLikeControllerRest postLikeControllerRest;
-    private final PostLikeDAOImpl postLikeDAOImpl;
-    private final ObjectValidator objectValidator;
+    private final PostLikeService postLikeService;
 
     private PostLikeControllerRest() {
-        postLikeDAOImpl = PostLikeDAOImpl.getInstance();
-        objectValidator = new ObjectValidator();
+        postLikeService = PostLikeServiceImpl.getInstance();
     }
 
     /**
@@ -54,7 +53,7 @@ public final class PostLikeControllerRest {
     @Produces(MediaType.APPLICATION_JSON)
     public byte[] postLike(@PathParam("userId") final int userId,
                            @PathParam("postId") final int postId) {
-        return objectValidator.forSuccessResponse(postLikeDAOImpl.postLike(userId, postId), new byte[]{});
+        return postLikeService.postLike(userId, postId);
     }
 
     /**
@@ -62,15 +61,13 @@ public final class PostLikeControllerRest {
      * Removes a like for the specified post by the specified user.
      * </p>
      *
-     * @param userId The ID of the user who unlikes the post.
      * @param postId The ID of the post to be unliked.
      * @return The response containing the result of the operation.
      */
-    @Path("/remove/{postId}/{userId}")
+    @Path("/remove/{id}")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public byte[] postUnlike(@PathParam("userId") final int userId,
-                             @PathParam("postId") final int postId) {
-        return objectValidator.manualResponse(postLikeDAOImpl.postUnlike(userId, postId));
+    public byte[] postUnlike(@PathParam("id") final int postId) {
+        return postLikeService.postUnlike(postId);
     }
 }

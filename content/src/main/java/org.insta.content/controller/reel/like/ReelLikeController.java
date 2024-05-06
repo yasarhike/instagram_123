@@ -1,6 +1,7 @@
 package org.insta.content.controller.reel.like;
 
-import org.insta.content.dao.reel.like.ReelLikeDAO;
+import org.insta.content.service.reel.like.ReelLikeService;
+import org.insta.content.service.reel.like.ReelLikeServiceImpl;
 
 /**
  * <p>
@@ -9,11 +10,13 @@ import org.insta.content.dao.reel.like.ReelLikeDAO;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see ReelLikeService
+ * @see ReelLikeServiceImpl
  */
 public final class ReelLikeController {
 
     private static ReelLikeController reelLikeController;
-    private final ReelLikeDAO reelLikeDAO;
+    private final ReelLikeService reelLikeService;
 
     /**
      * <p>
@@ -21,7 +24,7 @@ public final class ReelLikeController {
      * </p>
      */
     private ReelLikeController() {
-        reelLikeDAO = ReelLikeDAO.getInstance();
+        reelLikeService = ReelLikeServiceImpl.getInstance();
     }
 
     /**
@@ -37,27 +40,26 @@ public final class ReelLikeController {
 
     /**
      * <p>
-     * Add like for a specific reel.
-     * </P>
+     * Adds a like for a specific reel.
+     * </p>
      *
-     * @param userId Refer to id of the user.
-     * @param reelId Refer the id of the reel.
-     * @return True if the post is updated successfully, otherwise false.
+     * @param userId the ID of the user
+     * @param reelId the ID of the reel
+     * @return the response in byte array format
      */
-    public int reelLike(final int userId, final int reelId) {
-        return reelLikeDAO.reelLike(userId, reelId);
+    public byte[] reelLike(final int userId, final int reelId) {
+        return reelLikeService.reelLike(userId, reelId);
     }
 
     /**
      * <p>
      * Removes a like for a specific reel.
-     * </P>
+     * </p>
      *
-     * @param userId Refers the id of the user.
-     * @param reelId Refers the id of the reel.
-     * @return True if the post is updated successfully, otherwise false.
+     * @param id the ID of the like to be removed
+     * @return the response in byte array format
      */
-    public boolean reelUnlike(final int id) {
-        return reelLikeDAO.reelUnlike(id);
+    public byte[] reelUnlike(final int id) {
+        return reelLikeService.reelUnlike(id);
     }
 }

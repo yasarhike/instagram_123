@@ -10,13 +10,18 @@ import java.sql.Statement;
 
 /**
  * <p>
- * Manage post share.
+ * Data Access Object interface for managing post shares.
+ * </p>
+ *
+ * <p>
+ * This interface provides methods for sharing and unsharing posts.
  * </p>
  *
  * @author Mohamed Yasar
- * @version 1.0 6 Feb 2024
+ * @version 1.0, 6 Feb 2024
+ * @see PostShareDAO
  */
-public final class PostShareDAOImpl implements PostShareDAO{
+public final class PostShareDAOImpl implements PostShareDAO {
 
     private static PostShareDAOImpl postShareDAOImpl;
     private final Connection connection;
@@ -45,12 +50,12 @@ public final class PostShareDAOImpl implements PostShareDAO{
 
     /**
      * <p>
-     * Like a particular post
+     * Shares a post.
      * </p>
      *
-     * @param postId Refers the postId for the post.
-     * @param userId Refers the userId for the user.
-     * @return True if the like is added successfully, otherwise false.
+     * @param postId the ID of the post to be shared
+     * @param userId the ID of the user sharing the post
+     * @return the ID of the added share, or 0 if unsuccessful
      */
     public int postShare(final int postId, final int userId) {
         try (final PreparedStatement preparedStatement = connection.prepareStatement(String.join(" ", "INSERT INTO post_share (post_id, shared_by)", "VALUES (?, ?)"), Statement.RETURN_GENERATED_KEYS)) {
@@ -69,11 +74,11 @@ public final class PostShareDAOImpl implements PostShareDAO{
 
     /**
      * <p>
-     * Unlike a particular post
+     * Unshares a post.
      * </p>
      *
-     * @param shareId Refers the shareId for the post.
-     * @return True if the like is added successfully, otherwise false.
+     * @param shareId the ID of the share to be removed
+     * @return true if the share is removed successfully, otherwise false
      */
     public boolean removeShare(final int shareId) {
         try (final PreparedStatement preparedStatement = connection.prepareStatement(String.join(" ", "Delete from post_share ", "where  id = ? "))) {
@@ -88,5 +93,4 @@ public final class PostShareDAOImpl implements PostShareDAO{
 
         return false;
     }
-
 }

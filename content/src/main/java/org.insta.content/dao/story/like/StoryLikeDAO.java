@@ -1,25 +1,37 @@
 package org.insta.content.dao.story.like;
 
+/**
+ * <p>
+ * Data Access Object (DAO) interface for managing story likes.
+ * </p>
+ *
+ * <p>
+ * Allows adding and removing likes for stories.
+ * </p>
+ *
+ * @author Mohamed Yasar
+ * @version 1.0 6 Feb 2024
+ */
 public interface StoryLikeDAO {
 
     /**
      * <p>
-     * Add a like for the particular story.
+     * Adds a like for the specified story by the user.
      * </p>
      *
-     * @param userId  Refers the userId for the user.
-     * @param storyId Refers the storyId of the story.
-     * @return True if the like is added successfully, otherwise false.
+     * @param userId  The ID of the user who likes the story.
+     * @param storyId The ID of the story to be liked.
+     * @return The ID of the inserted like if successful, otherwise 0.
      */
     int storyLike(final int userId, final int storyId);
 
     /**
      * <p>
-     * Remove a like for the particular post
+     * Removes a like for the specified story.
      * </p>
      *
-     * @param id Refers the storyId of the story.
-     * @return True if the UnLike is done successfully, otherwise false.
+     * @param id The ID of the story like to be removed.
+     * @return True if the like is removed successfully, otherwise false.
      */
     boolean storyUnlike(final int id);
 }

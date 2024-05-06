@@ -7,30 +7,45 @@ import org.insta.content.model.reel.Reel;
  * Managing reels service operation.
  * </p>
  *
+ * <p>
+ * This interface declares methods for managing reels, including adding, removing, and retrieving reels for users.
+ * </p>
+ *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see ReelServiceImpl
+ * @see Reel
  */
 public interface ReelService {
 
     /**
      * <p>
-     * Adds a reel for the specified user and set the timestamp.
+     * Adds a reel for the specified user and sets the timestamp.
      * </p>
      *
-     * @param reel   Refer to the {@link Reel} of the user.
-     * @param userId Refer the userId of the user adding the post.
-     * @return True if the reel is added successfully, otherwise false.
+     * @param reel The reel to add.
+     * @return A byte array representing the result of the operation.
+     * @see Reel
      */
-    boolean addReel(final Reel reel, final Integer userId);
+    byte[] addReel(final Reel reel);
 
     /**
      * <p>
      * Removes a reel with the specified ID for the specified user.
-     * </P>
+     * </p>
      *
-     * @param reelId Refer to reelId of the reel.
-     * @param userId Refer the userId of the user removing the reel.
-     * @return True if the reel is removed successfully, otherwise false.
+     * @param reelId The ID of the reel to remove.
+     * @return A byte array representing the result of the operation.
      */
-    boolean removeReel(final int reelId, final Integer userId);
+    byte[] removeReel(final int reelId);
+
+    /**
+     * <p>
+     * Retrieves a reel with the specified ID.
+     * </p>
+     *
+     * @param id The ID of the reel to retrieve.
+     * @return A byte array representing the retrieved reel.
+     */
+    byte[] getReel(final int id);
 }

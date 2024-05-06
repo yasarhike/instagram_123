@@ -1,11 +1,9 @@
 package org.insta.authentication.controller;
 
 
-import org.insta.authentication.groups.ValidationOrder;
 import org.insta.authentication.model.User;
 import org.insta.authentication.service.UserAccountService;
 import org.insta.authentication.service.UserAccountServiceImplementation;
-import org.insta.wrapper.jsonvalidator.ObjectValidator;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -15,15 +13,27 @@ import javax.ws.rs.core.MediaType;
  * Managing user accounts provides REST endpoints to create, retrieve, update, and delete user profiles.
  * </p>
  *
+ * <p>
+ * This class represents a RESTful controller for managing user accounts. It exposes endpoints for handling
+ * operations such as creating new user profiles, retrieving user profiles by ID, updating user profiles,
+ * and deleting user profiles. The actual implementation of these operations is delegated to the
+ * {@link UserAccountServiceImplementation} class.
+ * </p>
+ *
+ * <p>
+ * This class is annotated with JAX-RS annotations to specify the path and HTTP methods for each endpoint,
+ * as well as the input and output media types.
+ * </p>
+ *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see UserAccountServiceImplementation
  */
 @Path("/authentication")
 public final class UserAccountControllerRest {
 
     private static UserAccountControllerRest userAccountControllerRest;
     private final UserAccountService userAccountServiceImplementation;
-    private final ObjectValidator<User, ValidationOrder> objectValidator = new ObjectValidator<>();
 
     /**
      * Restrict object creation outside the class.
@@ -57,7 +67,7 @@ public final class UserAccountControllerRest {
     @Produces(MediaType.APPLICATION_JSON)
     @POST
     public byte[] createUser(final User user) {
-       return userAccountServiceImplementation.createProfile(user);
+        return userAccountServiceImplementation.createProfile(user);
     }
 
     /**

@@ -4,13 +4,12 @@ import org.insta.content.dao.post.share.PostShareDAOImpl;
 
 /**
  * <p>
- *     Manages post share.
+ * Manages post share.
  * </p>
- *
- * @see PostShareDAOImpl
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see PostShareDAOImpl
  */
 public class PostShareController {
 
@@ -32,6 +31,7 @@ public class PostShareController {
         return postShareController == null ? new PostShareController() : postShareController;
     }
 
+
     /**
      * <p>
      * Shares the specified post by the specified user.
@@ -41,19 +41,19 @@ public class PostShareController {
      * @param postId The ID of the post to be shared.
      * @return The ID of the shared post.
      */
-    public int postShare( final int userId, final int postId) {
+    public int postShare(final int userId, final int postId) {
         return postShareDAOImpl.postShare(userId, postId);
     }
 
     /**
      * <p>
      * Removes the share with the specified ID.
-     *</p>
+     * </p>
      *
      * @param shareId The ID of the share to be removed.
      * @return True if the share is removed successfully, otherwise false.
      */
-    public boolean removeShare( final int shareId) {
+    public boolean removeShare(final int shareId) {
         return postShareDAOImpl.removeShare(shareId);
     }
 }

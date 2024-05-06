@@ -1,14 +1,12 @@
 package org.insta.content.service.post;
 
-
 import org.insta.content.dao.post.PostServiceDAO;
 import org.insta.content.dao.post.PostServiceDAOImpl;
 import org.insta.content.groups.PostValidator;
 import org.insta.content.model.post.Post;
-import org.insta.content.service.home.content.ContentServiceImpl;
 import org.insta.wrapper.jsonvalidator.ObjectValidator;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * <p>
@@ -18,11 +16,11 @@ import java.util.Map;
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
  */
-public final class PostServiceImpl implements PostService{
+public final class PostServiceImpl implements PostService {
 
     private static PostServiceImpl postServiceImplementation;
     private final PostServiceDAO postServiceDAO;
-    private final ObjectValidator<Post, PostValidator> objectValidator;
+    private final ObjectValidator objectValidator;
 
 
     /**
@@ -32,7 +30,7 @@ public final class PostServiceImpl implements PostService{
      */
     private PostServiceImpl() {
         postServiceDAO = PostServiceDAOImpl.getInstance();
-        objectValidator = new ObjectValidator<>();
+        objectValidator = ObjectValidator.getInstance();
     }
 
     /**
@@ -44,7 +42,7 @@ public final class PostServiceImpl implements PostService{
      * @return The singleton instance of PostServiceImplementation class.
      */
     public static PostServiceImpl getInstance() {
-        return postServiceImplementation == null ? postServiceImplementation = new PostServiceImpl()
+        return postServiceImplementation == null ? new PostServiceImpl()
                 : postServiceImplementation;
     }
 
@@ -53,22 +51,23 @@ public final class PostServiceImpl implements PostService{
      * Adds a post for the specified user.
      * </p>
      *
-     * @param post   Refer to the post to the user.
-     * @return True if the post is added successfully, otherwise false.
+     * @param post the post to be added
+     * @return a byte array representing the result of the operation
      */
     public byte[] addPost(final Post post) {
         final byte[] violations = objectValidator.validate(post, PostValidator.class);
-        return violations != null && violations.length > 0 ? objectValidator.forFailureResponse(violations, false)
+
+        return violations.length > 0 ? violations
                 : objectValidator.forSuccessResponse(postServiceDAO.addPost(post), violations);
     }
 
     /**
      * <p>
-     * Removes a post with the specified ID for the specified user.
-     * </P>
+     * Removes a post with the specified ID.
+     * </p>
      *
-     * @param postId Refer to id of the post.
-     * @return True if the post is removed successfully, otherwise false.
+     * @param postId the ID of the post to be removed
+     * @return a byte array representing the result of the operation
      */
     public byte[] removePost(final int postId) {
         return objectValidator.manualResponse(postServiceDAO.removePost(postId));
@@ -76,27 +75,16 @@ public final class PostServiceImpl implements PostService{
 
     /**
      * <p>
-     * get a post with the specified ID for the specified user.
-     * </P>
+     * Retrieves a post with the specified ID.
+     * </p>
      *
-     * @param id Refer to id of the post.
-     * @return True if the post is removed successfully, otherwise false.
+     * @param id the ID of the post to be retrieved
+     * @return a byte array representing the retrieved post
      */
     public byte[] getPost(final int id) {
-        final Post post = postServiceDAO.getPost(id);
-        return post != null ? objectValidator.objectResponse(post)
-                : objectValidator.manualResponse(false);
-    }
+        final List<Post> post = postServiceDAO.displayPost(id);
 
-    /**
-     * <p>
-     * Update a post with the specified ID for the specified user.
-     * </P>
-     *
-     * @param post {@link Post} Refer to post of the user want to update.
-     * @return True if the post is removed successfully, otherwise false.
-     */
-    public byte[] updatePost(final Post post) {
-        return objectValidator.manualResponse(postServiceDAO.updatePost(post));
+        return post.isEmpty() ? objectValidator.objectResponse(post)
+                : objectValidator.manualResponse(false);
     }
 }

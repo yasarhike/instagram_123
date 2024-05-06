@@ -13,10 +13,11 @@ import java.sql.Statement;
  * Managing user story like.
  * </p>
  *
+ * @see StoryLikeDAO
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
  */
-public final class StoryLikeDAOImpl implements StoryLikeDAO{
+public final class StoryLikeDAOImpl implements StoryLikeDAO {
 
     private static StoryLikeDAOImpl storyLikeDAOImpl;
     private final Connection connection;
@@ -45,16 +46,16 @@ public final class StoryLikeDAOImpl implements StoryLikeDAO{
 
     /**
      * <p>
-     * Add a like for the particular story.
+     * Adds a like for the specified story by the user.
      * </p>
      *
-     * @param userId  Refers the userId for the user.
-     * @param storyId Refers the storyId of the story.
-     * @return True if the like is added successfully, otherwise false.
+     * @param userId  The ID of the user who likes the story.
+     * @param storyId The ID of the story to be liked.
+     * @return The ID of the inserted like if successful, otherwise 0.
      */
     public int storyLike(final int userId, final int storyId) {
         try (final PreparedStatement preparedStatement = connection.prepareStatement(String.join(" ", "INSERT INTO story_like (story_id, liked_by)", "VALUES (?, ?)")
-        , Statement.RETURN_GENERATED_KEYS)) {
+                , Statement.RETURN_GENERATED_KEYS)) {
 
             connection.setAutoCommit(true);
             preparedStatement.setInt(1, storyId);
@@ -65,7 +66,6 @@ public final class StoryLikeDAOImpl implements StoryLikeDAO{
             }
 
         } catch (final SQLException ignored) {
-            System.out.println("Operation failed");
         }
 
         return 0;
@@ -73,15 +73,15 @@ public final class StoryLikeDAOImpl implements StoryLikeDAO{
 
     /**
      * <p>
-     * Remove a like for the particular post
+     * Removes a like for the specified story.
      * </p>
      *
-     * @param storyId Refers the storyId of the story.
-     * @return True if the UnLike is done successfully, otherwise false.
+     * @param storyId The ID of the story like to be removed.
+     * @return True if the like is removed successfully, otherwise false.
      */
     public boolean storyUnlike(final int storyId) {
         try (final PreparedStatement preparedStatement = connection.prepareStatement(String.join
-                (" ", "Delete from story_like ", "where id = ?"))) {
+                (" ", "Delete from story_like where id = ?"))) {
 
             connection.setAutoCommit(true);
             preparedStatement.setInt(1, storyId);

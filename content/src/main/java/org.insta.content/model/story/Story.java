@@ -4,17 +4,24 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.insta.content.groups.StoryValidator;
+import org.insta.content.model.common.Common;
 import org.insta.content.model.home.Media;
 
 import java.sql.Timestamp;
 
 /**
  * <p>
- * Contains story details of the user.
+ * Represents a story.
+ * </p>
+ *
+ * <p>
+ * This class defines properties for a story, including the story ID, user ID,
+ * content ID, and the story content itself.
  * </p>
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see Common
  */
 public final class Story {
 

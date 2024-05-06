@@ -2,32 +2,37 @@ package org.insta.content.dao.post.share;
 
 /**
  * <p>
- * Manage post share.
+ * Data Access Object interface for managing post shares.
+ * </p>
+ *
+ * <p>
+ * This interface provides methods for sharing and unsharing posts.
  * </p>
  *
  * @author Mohamed Yasar
- * @version 1.0 6 Feb 2024
+ * @version 1.0, 6 Feb 2024
+ * @see PostShareDAOImpl
  */
 public interface PostShareDAO {
 
     /**
      * <p>
-     * share a post
+     * Shares a post.
      * </p>
      *
-     * @param postId Refers the postId for the post.
-     * @param userId Refers the userId for the user.
-     * @return True if the like is added successfully, otherwise false.
+     * @param postId the ID of the post to be shared
+     * @param userId the ID of the user sharing the post
+     * @return the ID of the added share, or 0 if unsuccessful
      */
-     int postShare(final int postId, final int userId);
+    int postShare(final int postId, final int userId);
 
     /**
      * <p>
-     * unSHare a post
+     * Unshares a post.
      * </p>
      *
-     * @param shareId Refers the shareId for the post.
-     * @return True if the like is added successfully, otherwise false.
+     * @param shareId the ID of the share to be removed
+     * @return true if the share is removed successfully, otherwise false
      */
-     boolean removeShare(final int shareId);
+    boolean removeShare(final int shareId);
 }

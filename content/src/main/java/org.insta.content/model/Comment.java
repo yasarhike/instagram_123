@@ -5,7 +5,21 @@ import jakarta.validation.constraints.NotNull;
 import org.insta.content.groups.CommentValidator;
 import org.insta.content.model.common.Common;
 
-public class Comment extends Common {
+/**
+ * <p>
+ * Represents a comment.
+ * </p>
+ *
+ * <p>
+ * This class defines properties for a comment, including the comment ID, user ID,
+ * content ID, and the comment content itself.
+ * </p>
+ *
+ * @author Mohamed Yasar
+ * @version 1.0 6 Feb 2024
+ * @see Common
+ */
+public final class Comment extends Common {
 
     @NotNull(message = "Comment id must not null", groups = CommentValidator.class)
     private int id;
@@ -15,10 +29,6 @@ public class Comment extends Common {
     private int contentId;
     @NotBlank(message = "Comment id must not be blank", groups = CommentValidator.class)
     private String comment;
-
-    public void setUserId(final int userId) {
-        this.userId = userId;
-    }
 
     public String getComment() {
         return comment;
@@ -30,6 +40,10 @@ public class Comment extends Common {
 
     public int getUserId() {
         return userId;
+    }
+
+    public void setUserId(final int userId) {
+        this.userId = userId;
     }
 
     public int getContentId() {

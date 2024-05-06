@@ -18,20 +18,59 @@ import org.insta.content.controller.story.share.StoryShareControllerRest;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ServerFactoryImpl implements ServerFactory{
+/**
+ * <p>
+ * Implementation of the {@link ServerFactory} interface for creating JAX-RS server instances.
+ * This implementation adds service classes to the server instance and configures it with a Jackson JSON provider.
+ * </p>
+ *
+ * <p>
+ * This class follows the Singleton pattern to ensure only one instance exists throughout the application.
+ * </p>
+ *
+ * @see ServerFactory
+ * @see JAXRSServerFactoryBean
+ * @see JacksonJsonProvider
+ *
+ * @author Mohamed Yasar
+ * @version 1.0 6 Feb 2024
+ */
+public final class ServerFactoryImpl implements ServerFactory {
 
     private static ServerFactoryImpl serverFactoryImpl;
     private final JacksonJsonProvider jacksonJsonProvider;
 
+    /**
+     * <p>
+     * Private constructor to restrict the creation of instances outside of the class.
+     * Initializes the Jackson JSON provider.
+     * </p>
+     */
     private ServerFactoryImpl() {
         jacksonJsonProvider = new JacksonJsonProvider();
     }
 
+    /**
+     * <p>
+     * Returns the singleton instance of ServerFactoryImpl.
+     * </p>
+     *
+     * @return The singleton instance of ServerFactoryImpl.
+     */
     public static ServerFactoryImpl getInstance() {
         return serverFactoryImpl == null ? new ServerFactoryImpl() : serverFactoryImpl;
     }
 
-    private  JAXRSServerFactoryBean createServer(final String address, final List<Object> serviceClass) {
+    /**
+     * <p>
+     * Creates a JAX-RS server instance with the provided address and service classes.
+     * </p>
+     *
+     * @param address      The address where the server will be hosted.
+     * @param serviceClass The list of service classes to be added to the server.
+     * @return A configured {@link JAXRSServerFactoryBean} instance.
+     */
+    private JAXRSServerFactoryBean createServer(final String address, final List<Object> serviceClass) {
 
         final JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
 
@@ -42,6 +81,13 @@ public final class ServerFactoryImpl implements ServerFactory{
         return factory;
     }
 
+    /**
+     * <p>
+     * Adds service classes to the JAX-RS server instance and creates the server.
+     * </p>
+     *
+     * @return A configured {@link JAXRSServerFactoryBean} instance with the added service classes.
+     */
     public JAXRSServerFactoryBean addServiceClass() {
         final List<Object> serviceClasses = new ArrayList<>();
 

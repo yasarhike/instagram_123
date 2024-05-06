@@ -9,28 +9,32 @@ import org.insta.authentication.model.User;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see UserAccountServiceImplementation
  */
 public interface UserAccountService {
 
     /**
+     * <p>
      * Creates a new user profile.
+     * </p>
      *
      * @param user The user object containing the user data to be created.
      * @return A byte array representing the created user profile, or null if creation failed.
      */
     byte[] createProfile(final User user);
 
-
     /**
      * Retrieves a user profile based on the provided user ID.
      *
-     * @param id The ID of the user profile to retrieve.
+     * @param profileId The ID of the user profile to retrieve.
      * @return A byte array representing the retrieved user profile, or null if no profile found.
      */
-    byte[] getProfile(final int id);
+    byte[] getProfile(final int profileId);
 
     /**
+     * <p>
      * Updates an existing user profile.
+     * </p>
      *
      * @param user The user object containing the updated user data.
      * @return A byte array representing the updated user profile, or null if update failed.
@@ -42,8 +46,8 @@ public interface UserAccountService {
      * Deletes a user profile based on the provided user ID.
      * </p>
      *
-     * @param id The ID of the user profile to delete.
+     * @param profileId The ID of the user profile to delete.
      * @return A byte array representing the deleted user profile, or null if update failed.
      */
-    byte[] deleteProfile(final int id);
+    byte[] deleteProfile(final int profileId);
 }

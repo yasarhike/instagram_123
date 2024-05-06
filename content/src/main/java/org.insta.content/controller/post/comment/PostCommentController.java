@@ -10,6 +10,7 @@ import org.insta.content.model.Comment;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see PostCommentDAOImpl
  */
 public final class PostCommentController {
 
@@ -41,10 +42,8 @@ public final class PostCommentController {
      * Adds a comment for the specified post.
      * </p>
      *
-     * @param userId  Refer to the userId of the user.
-     * @param postId  Refer the postId of the post.
-     * @param caption Refer the caption of the post.
-     * @return True if the comment is added successfully, otherwise false.
+     * @param comment the comment object to be added
+     * @return the ID of the added comment if successful, otherwise -1
      */
     public int addComment(final Comment comment) {
         return postCommentDAOImpl.postComment(comment);
@@ -55,10 +54,8 @@ public final class PostCommentController {
      * Removes a comment for the specified post.
      * </p>
      *
-     * @param userId    Refer to the userId of the user.
-     * @param postId    Refer the postId of the post.
-     * @param commentId Refer the commentId of the post.
-     * @return True if the comment is removed successfully, otherwise false.
+     * @param id the ID of the comment to be removed
+     * @return true if the comment is removed successfully, otherwise false
      */
     public boolean removeComment(final int id) {
         return postCommentDAOImpl.deleteComment(id);

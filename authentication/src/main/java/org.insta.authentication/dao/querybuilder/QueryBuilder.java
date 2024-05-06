@@ -1,7 +1,7 @@
 package org.insta.authentication.dao.querybuilder;
 
+import org.insta.authentication.exception.UserNotFoundException;
 import org.insta.authentication.model.User;
-import org.insta.authentication.view.Key;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,88 +39,7 @@ public final class QueryBuilder {
      * @return Singleton instance of QueryHandler.
      */
     public static QueryBuilder getInstance() {
-        return queryBuilder == null ? queryBuilder = new QueryBuilder() : queryBuilder;
-    }
-
-    /**
-     * <p>
-     * Sets the user ID based on the generated keys in the PreparedStatement.
-     * </p>
-     *
-     * @param preparedStatement The PreparedStatement containing the generated keys.
-     * @param user              The User object to set the user ID.
-     * @return The generated user ID if set successfully, otherwise 0.
-     */
-    public Integer setUserId(final PreparedStatement preparedStatement, final User user) {
-        try (final ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
-            if (resultSet.next()) {
-                user.setUserId(resultSet.getInt("id"));
-                user.setName(resultSet.getString("name"));
-                user.setMobileNumber(resultSet.getString("mobile"));
-                user.setEmail(resultSet.getString("email"));
-
-                return user.getUserId();
-            } else {
-                user.setUserId(0);
-            }
-        } catch (SQLException ignored) {
-            user.setUserId(0);
-        }
-        return user.getUserId();
-    }
-
-    /**
-     * <p>
-     * Sets the user details based on the ResultSet.
-     * </p>
-     *
-     * @param resultSet The ResultSet containing the generated data.
-     * @return The User object with details set from the ResultSet.
-     */
-    public User setUser(final ResultSet resultSet) {
-        User user = null;
-
-        try {
-            if (resultSet.next()) {
-                user = new User();
-                user.setUserId(resultSet.getInt(1));
-                user.setName(resultSet.getString(2));
-                user.setMobileNumber(resultSet.getString(3));
-                user.setEmail(resultSet.getString(4));
-                user.setPassword(resultSet.getString(5));
-                user.getAddress().setDoorNumber(resultSet.getInt(7));
-                user.getAddress().setState(resultSet.getString(8));
-                user.getAddress().setStreetName(resultSet.getString(10));
-                return user;
-            }
-        } catch (final SQLException exception) {
-            System.out.println("Operation failed");
-        }
-        return user;
-    }
-
-
-    /**
-     * <p>
-     * Gets query for mobile, email, and name for login.
-     * </p>
-     *
-     * @param key The Key enum containing the type of query.
-     * @return The generated query based on the user type, otherwise null.
-     */
-    public String getQuery(final Key key) {
-        switch (key) {
-            case MOBILE -> {
-                return String.join(" ", "select * from account", "left join address on address.user_id = account.id", "where account.mobile = ? and account.password = ?");
-            }
-            case EMAIL -> {
-                return String.join(" ", "select * from account", "left join address on address.user_id = account.id", "where account.email = ? and account.password = ? ");
-            }
-            case NAME -> {
-                return String.join(" ", "select * from account", "left join address on address.user_id = account.id", "where account.name = ? and account.password = ? ");
-            }
-        }
-        return null;
+        return queryBuilder == null ? new QueryBuilder() : queryBuilder;
     }
 
     /**
@@ -176,7 +95,6 @@ public final class QueryBuilder {
 
         return !queryList.isEmpty() ? query : null;
     }
-
 
     /**
      * <p>
@@ -377,8 +295,108 @@ public final class QueryBuilder {
                 "where account.id = ?");
     }
 
+    /**
+     * <p>
+     * Generates SQL query to check if a user exists in the account table by name, mobile, or email.
+     * </p>
+     *
+     * @return SQL query to check user existence
+     */
     public String checkUserExists() {
-        return String.join(" ", "select * from account",
-                " where name = ? or mobile = ? or email ?");
+        return String.join(" ", "select * from account ",
+                " where name = ? or mobile = ? or email = ? ");
+    }
+
+    /**
+     * <p>
+     * Generates SQL query to check if a mobile number exists in the account table.
+     * </p>
+     *
+     * @return SQL query to check mobile existence
+     */
+    public String checkMobileExists() {
+        return String.join(" ", "select mobile from account ",
+                " where mobile = ? ");
+    }
+
+    /**
+     * <p>
+     * Generates SQL query to check if an email exists in the account table.
+     * </p>
+     *
+     * @return SQL query to check email existence
+     */
+    public String checkEmailExists() {
+        return String.join(" ", "select email from account ",
+                " where email = ? ");
+    }
+
+    /**
+     * <p>
+     * Generates SQL query to check if a name exists in the account table.
+     * </p>
+     *
+     * @return SQL query to check name existence
+     */
+    public String checkNameExists() {
+        return String.join(" ", "select name from account ",
+                " where name = ? ");
+    }
+
+    /**
+     * <p>
+     * Sets the user ID based on the generated keys in the PreparedStatement.
+     * </p>
+     *
+     * @param preparedStatement The PreparedStatement containing the generated keys.
+     * @param user              The User object to set the user ID.
+     * @return The generated user ID if set successfully, otherwise 0.
+     */
+    public Integer setUserId(final PreparedStatement preparedStatement, final User user) {
+        try (final ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+            if (resultSet.next()) {
+                user.setUserId(resultSet.getInt("id"));
+                user.setName(resultSet.getString("name"));
+                user.setMobileNumber(resultSet.getString("mobile"));
+                user.setEmail(resultSet.getString("email"));
+
+                return user.getUserId();
+            } else {
+                user.setUserId(0);
+            }
+        } catch (SQLException ignored) {
+            user.setUserId(0);
+        }
+        return user.getUserId();
+    }
+
+    /**
+     * <p>
+     * Sets the user details based on the ResultSet.
+     * </p>
+     *
+     * @param resultSet The ResultSet containing the generated data.
+     * @return The User object with details set from the ResultSet.
+     */
+    public User setUser(final ResultSet resultSet) {
+        User user = null;
+
+        try {
+            if (resultSet.next()) {
+                user = new User();
+                user.setUserId(resultSet.getInt(1));
+                user.setName(resultSet.getString(2));
+                user.setMobileNumber(resultSet.getString(3));
+                user.setEmail(resultSet.getString(4));
+                user.setPassword(resultSet.getString(5));
+                user.getAddress().setDoorNumber(resultSet.getInt(7));
+                user.getAddress().setState(resultSet.getString(8));
+                user.getAddress().setStreetName(resultSet.getString(10));
+                return user;
+            }
+        } catch (final SQLException exception) {
+            throw new UserNotFoundException("User not found");
+        }
+        return user;
     }
 }

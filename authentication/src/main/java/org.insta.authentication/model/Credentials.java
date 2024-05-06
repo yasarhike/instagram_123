@@ -1,14 +1,20 @@
 package org.insta.authentication.model;
 
-import javax.naming.Name;
-
+/**
+ * <p>
+ * Constants for User credential details.
+ * </p>
+ *
+ * @author Mohamed Yasar k
+ * @version 1.0 6 Feb 2024
+ */
 public enum Credentials {
 
     MOBILE(1), EMAIL(2), NAME(3), SUCCESS(0);
 
     private final int id;
 
-    Credentials(int id) {
+    Credentials(final int id) {
         this.id = id;
     }
 

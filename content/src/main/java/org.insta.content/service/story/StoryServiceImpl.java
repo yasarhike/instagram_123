@@ -1,22 +1,31 @@
 package org.insta.content.service.story;
 
+import org.insta.content.dao.story.StoryServiceDAO;
+import org.insta.content.dao.story.StoryServiceDAOImpl;
+import org.insta.content.groups.StoryValidator;
 import org.insta.content.model.story.Story;
-import org.insta.content.service.home.content.ContentServiceImpl;
-
-import java.util.Map;
+import org.insta.wrapper.jsonvalidator.ObjectValidator;
 
 /**
  * <p>
- * Implementation class for managing story.
+ * Implementation class for managing stories.
+ * </p>
+ *
+ * <p>
+ * This class provides methods to add, remove, and retrieve stories for users.
  * </p>
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see StoryService
+ * @see Story
+ * @see StoryValidator
  */
-public final class StoryServiceImpl {
+public final class StoryServiceImpl implements StoryService {
 
-    private static StoryServiceImpl storyServiceImpl;
-    private final ContentServiceImpl<Story> storyService;
+    private static StoryService storyServiceImpl;
+    private final StoryServiceDAO storyServiceDAO;
+    private final ObjectValidator objectValidator;
 
     /**
      * <p>
@@ -24,7 +33,8 @@ public final class StoryServiceImpl {
      * </p>
      */
     private StoryServiceImpl() {
-        storyService = new ContentServiceImpl<>();
+        storyServiceDAO = StoryServiceDAOImpl.getInstance();
+        objectValidator = ObjectValidator.getInstance();
     }
 
     /**
@@ -34,8 +44,8 @@ public final class StoryServiceImpl {
      *
      * @return The singleton instance of StoryServiceImplementation class.
      */
-    public static StoryServiceImpl getInstance() {
-        return storyServiceImpl == null ? storyServiceImpl = new StoryServiceImpl()
+    public static StoryService getInstance() {
+        return storyServiceImpl == null ? new StoryServiceImpl()
                 : storyServiceImpl;
     }
 
@@ -44,35 +54,39 @@ public final class StoryServiceImpl {
      * Adds a story for the specified user.
      * </p>
      *
-     * @param story  Refer to the {@link Story} of the user.
-     * @param userId Refer the userId of the user adding the story.
-     * @return True if the story is added successfully, otherwise false.
+     * @param story The story to add.
+     * @return A byte array representing either validation violations or a success response.
+     * @see Story
      */
-    public boolean addStory(final Story story, final Integer userId) {
-        return storyService.add(story, userId);
+    public byte[] addStory(final Story story) {
+        final byte[] violations = objectValidator.validate(story, StoryValidator.class);
+
+        return violations.length > 0 ? violations
+                : objectValidator.forSuccessResponse(storyServiceDAO.addStory(story), violations);
     }
 
     /**
      * <p>
-     * Removes a reel with the specified ID for the specified user.
-     * </P>
-     *
-     * @param storyId Refer to id of the story.
-     * @param userId  Refer the userId of the user removing the story.
-     * @return True if the story is removed successfully, otherwise false.
-     */
-    public boolean removeStory(final int storyId, final Integer userId) {
-        return storyService.remove(storyId, userId);
-    }
-
-    /**
-     * <p>
-     * Retrieves all story.
+     * Removes a story with the specified ID.
      * </p>
      *
-     * @return Map contains the user story.
+     * @param storyId The ID of the story to remove.
+     * @return A byte array representing a manual response.
      */
-    public Map<Integer, Map<Integer, Story>> getStory() {
-        return storyService.getContent();
+    public byte[] removeStory(final int storyId) {
+        return objectValidator.manualResponse(storyServiceDAO.removeStory(storyId));
+    }
+
+
+    /**
+     * <p>
+     * Retrieves a story with the specified ID.
+     * </p>
+     *
+     * @param storyId The ID of the story to retrieve.
+     * @return A byte array representing the retrieved story.
+     */
+    public byte[] getStory(final int storyId) {
+        return objectValidator.objectResponse(storyServiceDAO.getStory(storyId));
     }
 }

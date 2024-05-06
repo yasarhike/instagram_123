@@ -1,34 +1,29 @@
 package org.insta.content.controller.post.share;
 
 import org.insta.content.dao.post.share.PostShareDAOImpl;
-import org.insta.content.model.common.IdSetter;
-import org.insta.wrapper.jsonvalidator.ObjectValidator;
+import org.insta.content.service.post.share.PostShareService;
+import org.insta.content.service.post.share.PostShareServiceImpl;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 /**
  * <p>
- *     Manages post share.
+ * Manages post share.
  * </p>
- *
- * @see PostShareDAOImpl
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see PostShareDAOImpl
  */
-@Path("/postsshare")
+@Path("/postshare")
 public class PostShareControllerRest {
 
     private static PostShareControllerRest postShareControllerRest;
-    private final PostShareDAOImpl postShareDAOImpl;
-    private final ObjectValidator objectValidator;
-    private final IdSetter idSetter;
+    private final PostShareService postShareDAOImpl;
 
     private PostShareControllerRest() {
-        postShareDAOImpl = PostShareDAOImpl.getInstance();
-        objectValidator = new ObjectValidator();
-        idSetter = IdSetter.getInstance();
+        postShareDAOImpl = PostShareServiceImpl.getInstance();
     }
 
     /**
@@ -56,13 +51,13 @@ public class PostShareControllerRest {
     @Produces(MediaType.APPLICATION_JSON)
     public byte[] postShare(@PathParam("userId") final int userId,
                             @PathParam("postId") final int postId) {
-        return objectValidator.forSuccessResponse(postShareDAOImpl.postShare(userId, postId), new byte[]{});
+        return postShareDAOImpl.postShare(postId, userId);
     }
 
     /**
      * <p>
      * Removes the share with the specified ID.
-     *</p>
+     * </p>
      *
      * @param shareId The ID of the share to be removed.
      * @return True if the share is removed successfully, otherwise false.
@@ -71,6 +66,6 @@ public class PostShareControllerRest {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public byte[] postUnShare(@PathParam("shareId") final int shareId) {
-        return objectValidator.manualResponse(postShareDAOImpl.removeShare(shareId));
+        return postShareDAOImpl.removeShare(shareId);
     }
 }

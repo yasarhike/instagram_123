@@ -20,7 +20,7 @@ public final class Activator implements BundleActivator {
      * @param bundleContext The context of the bundle.
      */
     @Override
-    public void start(BundleContext bundleContext){
+    public void start(final BundleContext bundleContext) {
         System.out.println("Starting : AUTHENTICATION");
     }
 
@@ -32,7 +32,7 @@ public final class Activator implements BundleActivator {
      * @param bundleContext The context of the bundle.
      */
     @Override
-    public void stop(BundleContext bundleContext){
+    public void stop(final BundleContext bundleContext) {
         System.out.println("Stopping : AUTHENTICATION");
     }
 }

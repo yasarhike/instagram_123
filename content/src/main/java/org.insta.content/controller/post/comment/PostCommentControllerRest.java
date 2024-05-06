@@ -4,42 +4,40 @@ import org.insta.content.dao.post.comment.PostCommentDAOImpl;
 import org.insta.content.groups.CommentValidator;
 import org.insta.content.model.Comment;
 import org.insta.content.model.groups.ReelsGroup;
+import org.insta.content.service.post.comment.PostCommentService;
+import org.insta.content.service.post.comment.PostCommentServiceImpl;
 import org.insta.wrapper.jsonvalidator.ObjectValidator;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.function.Consumer;
 
 /**
  * <p>
- *     Manages Post comments.
+ * Manages Post comments.
  * </p>
  *
+ * @author Mohamed Yasar
+ * @version 1.0 6 Feb 2024
  * @see Comment
  * @see ReelsGroup
  * @see PostCommentDAOImpl
  * @see ObjectValidator
  * @see CommentValidator
- *
- * @author Mohamed Yasar
- * @version 1.0 6 Feb 2024
  */
-@Path("/postscomment")
+@Path("/postcomment")
 public final class PostCommentControllerRest {
 
     private static PostCommentControllerRest postCommentControllerRest;
-    private final PostCommentDAOImpl postCommentDAOImpl;
-    private final ObjectValidator<Comment, ReelsGroup> objectValidator;
+    private final PostCommentService postCommentService;
 
     private PostCommentControllerRest() {
-        postCommentDAOImpl = PostCommentDAOImpl.getInstance();
-        objectValidator = new ObjectValidator<>();
+        postCommentService = PostCommentServiceImpl.getInstance();
     }
 
     /**
      * <p>
      * Returns the singleton instance of PostCommentControllerRest class.
-     *</p>
+     * </p>
      *
      * @return The singleton instance of PostCommentControllerRest class.
      */
@@ -50,7 +48,7 @@ public final class PostCommentControllerRest {
     /**
      * <p>
      * Adds a comment for the specified post.
-     *</p>
+     * </p>
      *
      * @param comment The comment to be added.
      * @return The response containing the result of the operation.
@@ -59,12 +57,8 @@ public final class PostCommentControllerRest {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public byte[] postComment( final Comment comment) {
-        final byte[] violations = objectValidator.validate(comment, CommentValidator.class);
-
-        return violations != null && violations.length > 0 ?
-                objectValidator.forFailureResponse(violations, false)
-                : objectValidator.forSuccessResponse(postCommentDAOImpl.postComment(comment), violations);
+    public byte[] postComment(final Comment comment) {
+        return postCommentService.postComment(comment);
     }
 
     /**
@@ -79,6 +73,6 @@ public final class PostCommentControllerRest {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public byte[] removeComment(@PathParam("id") final int id) {
-        return objectValidator.manualResponse(postCommentDAOImpl.deleteComment(id));
+        return postCommentService.deleteComment(id);
     }
 }

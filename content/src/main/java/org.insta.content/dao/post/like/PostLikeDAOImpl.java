@@ -72,15 +72,13 @@ public final class PostLikeDAOImpl implements PostLikeDAO{
      * </p>
      *
      * @param postId Refers the postId for the post.
-     * @param userId Refers the userId for the user.
      * @return True if the like is added successfully, otherwise false.
      */
-    public boolean postUnlike(final int userId, final int postId) {
-        try (final PreparedStatement preparedStatement = connection.prepareStatement(String.join(" ", "Delete from post_like ", "where post_id = ? and liked_by = ? "))) {
+    public boolean postUnlike(final int postId) {
+        try (final PreparedStatement preparedStatement = connection.prepareStatement(String.join(" ", "Delete from post_like ", "where id = ? "))) {
 
             connection.setAutoCommit(true);
             preparedStatement.setInt(1, postId);
-            preparedStatement.setInt(2, userId);
 
             return preparedStatement.executeUpdate() > 0;
 

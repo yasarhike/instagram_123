@@ -11,15 +11,13 @@
 
     <modules>
         <module>database</module>
-        <module>home-interface</module>
         <module>consolescanner</module>
-        <module>Insta-feature</module>
         <module>authentication</module>
         <module>content</module>
-        <module>main</module>
         <module>server</module>
         <module>wrapper</module>
         <module>exception</module>
+        <module>Instagram-org-feature</module>
     </modules>
 
     <dependencies>

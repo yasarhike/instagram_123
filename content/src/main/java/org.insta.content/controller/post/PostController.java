@@ -13,6 +13,7 @@ import java.util.List;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see PostServiceDAOImpl
  */
 public final class PostController {
 
@@ -36,7 +37,7 @@ public final class PostController {
      * @return The singleton instance of PostController class.
      */
     public static PostController getInstance() {
-        return postController == null ? postController = new PostController() : postController;
+        return postController == null ? new PostController() : postController;
     }
 
     /**
@@ -61,18 +62,6 @@ public final class PostController {
      */
     public boolean removePost(final int id) {
         return postServiceDAOImpl.removePost(id);
-    }
-
-    /**
-     * <p>
-     * Updates the post with the specified ID.
-     * </P>
-     *
-     * @param post Refer to {@link Post} of the user.
-     * @return True if the post is updated successfully, otherwise false.
-     */
-    public boolean updatePost(final Post post) {
-        return postServiceDAOImpl.updatePost(post);
     }
 
     /**

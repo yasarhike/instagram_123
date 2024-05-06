@@ -2,33 +2,36 @@ package org.insta.authentication.model;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import org.insta.authentication.groups.ValidationOrder;
+import org.insta.authentication.groups.UserCredentialsValidator;
 
-
+/**
+ * <p>
+ * Contains the user details.
+ * </p>
+ *
+ * @see Address
+ * @author Mohamed Yasar k
+ * @version 1.0 6 Feb 2024
+ */
 public final class User {
 
-    @Positive(message = "User id must be positive", groups = ValidationOrder.class)
-    private int userId;
-
-    @Pattern(regexp = "^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$")
-    @NotNull(message = "Name must not be null", groups = ValidationOrder.class)
-    private String name;
-
-    @Size(min = 2, max = 14)
-    @NotNull(message = "Mobile number must not be null", groups = ValidationOrder.class)
-    private String mobileNumber;
-
-    @Email
-    @NotNull(message = "Email must not be null", groups = ValidationOrder.class)
-    private String email;
-
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$", groups = ValidationOrder.class)
-    @NotNull(message = "Password must not be null", groups = ValidationOrder.class)
-    private String password;
-
     @Valid
-    @NotNull(message = "Address must not be null", groups = ValidationOrder.class)
+    @NotNull(message = "Address must not be null", groups = UserCredentialsValidator.class)
     private final Address address;
+    @PositiveOrZero(message = "User id must be positive", groups = UserCredentialsValidator.class)
+    private int userId;
+    @Pattern(regexp = "^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$")
+    @NotNull(message = "Name must not be null", groups = UserCredentialsValidator.class)
+    private String name;
+    @Size(min = 2, max = 14)
+    @NotNull(message = "Mobile number must not be null", groups = UserCredentialsValidator.class)
+    private String mobileNumber;
+    @Email
+    @NotNull(message = "Email must not be null", groups = UserCredentialsValidator.class)
+    private String email;
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$", groups = UserCredentialsValidator.class)
+    @NotNull(message = "Password must not be null", groups = UserCredentialsValidator.class)
+    private String password;
 
     public User() {
         this.address = new Address();
@@ -76,13 +79,5 @@ public final class User {
 
     public void setUserId(final Integer userId) {
         this.userId = userId;
-    }
-
-    @Override
-    public String toString() {
-        return String.join(" ","userName : ", this.name
-        , "\nmobileNumber : " , this.mobileNumber
-        , "\nemail : ", this.email
-        , this.address.toString());
     }
 }

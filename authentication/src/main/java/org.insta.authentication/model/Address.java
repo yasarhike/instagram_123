@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import org.insta.authentication.groups.ValidationOrder;
+import org.insta.authentication.groups.UserCredentialsValidator;
 
 /**
  * <p>
@@ -16,17 +16,16 @@ import org.insta.authentication.groups.ValidationOrder;
  */
 public final class Address {
 
-    @NotNull(message = "Country must not be null", groups = ValidationOrder.class)
+    @NotNull(message = "Country must not be null", groups = UserCredentialsValidator.class)
     private String country;
-
-    @Size(min = 2, max = 2, message = "Country code must be 2 characters", groups = ValidationOrder.class)
+    @Size(min = 2, max = 2, message = "Country code must be 2 characters", groups = UserCredentialsValidator.class)
     private String countryCode;
-    @NotBlank(message = "State must not be blank", groups = ValidationOrder.class)
+    @NotBlank(message = "State must not be blank", groups = UserCredentialsValidator.class)
     private String state;
-    @Positive(message = "Door number must be positive", groups = ValidationOrder.class)
+    @Positive(message = "Door number must be positive", groups = UserCredentialsValidator.class)
     private int doorNumber;
-    @NotBlank(message = "Street name must not be blank", groups = ValidationOrder.class)
-    @Size(max = 100, message = "Street name must be less than or equal to 100 characters", groups = ValidationOrder.class)
+    @NotBlank(message = "Street name must not be blank", groups = UserCredentialsValidator.class)
+    @Size(max = 100, message = "Street name must be less than or equal to 100 characters", groups = UserCredentialsValidator.class)
     private String streetName;
 
     public String getStreetName() {
@@ -67,17 +66,6 @@ public final class Address {
 
     public void setCountryCode(final String code) {
         this.countryCode = code;
-    }
-
-    @Override
-    public String toString() {
-        return "Address{" +
-                "country='" + country + '\'' +
-                ", countryCode='" + countryCode + '\'' +
-                ", state='" + state + '\'' +
-                ", doorNumber=" + doorNumber +
-                ", streetName='" + streetName + '\'' +
-                '}';
     }
 }
 

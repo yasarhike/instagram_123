@@ -6,54 +6,66 @@ import java.util.List;
 
 /**
  * <p>
- * Managing user post.
+ * Data Access Object interface for managing user posts.
+ * </p>
+ *
+ * <p>
+ * This interface provides methods for adding, removing, updating, and fetching posts for users.
  * </p>
  *
  * @author Mohamed Yasar
- * @version 1.0 6 Feb 2024
+ * @version 1.0, 6 Feb 2024
+ * @see PostServiceDAOImpl
  */
 public interface PostServiceDAO {
 
     /**
      * <p>
-     * Post a video or image for the user account
+     * Posts a video or image for the user account.
      * </p>
      *
-     * @param post {@link Post} Refers the post for the user.
-     * @return True if the post is added successfully, otherwise false.
+     * @param post the post to be added
+     * @return the ID of the added post, or 0 if unsuccessful
      */
     int addPost(final Post post);
 
     /**
      * <p>
-     * Delete a post for the user account
+     * Deletes a post for the user account.
      * </p>
      *
-     * @param postId Refers the postId for the user.
-     * @param userId Refers the userId of the user.
-     * @return True if the post is added successfully, otherwise false.
+     * @param postId the ID of the post to be removed
+     * @return true if the post is removed successfully, otherwise false
      */
     boolean removePost(final int postId);
 
     /**
      * <p>
-     * Update a post for the user account
+     * Updates a post for the user account.
      * </p>
      *
-     * @param post {@link Post}  Refers the post for the user.
-     * @return True if the post is updated successfully, otherwise false.
+     * @param post the updated post
+     * @return true if the post is updated successfully, otherwise false
      */
-    public boolean updatePost(final Post post);
+    boolean updatePost(final Post post);
 
     /**
      * <p>
-     * Displays a post for the all user
+     * Displays posts for all users.
      * </p>
      *
-     * @param id Refers the userId of the user.
-     * @return List if the post is fetched successfully, otherwise null.
+     * @param id the ID of the user
+     * @return a list of posts if fetched successfully, otherwise null
      */
-    public List<Post> displayPost(final int id);
+    List<Post> displayPost(final int id);
 
-    public Post getPost(final int id);
+    /**
+     * <p>
+     * Retrieves a post with the specified ID.
+     * </p>
+     *
+     * @param id the ID of the post to be retrieved
+     * @return the retrieved post, or null if not found
+     */
+    Post getPost(final int id);
 }

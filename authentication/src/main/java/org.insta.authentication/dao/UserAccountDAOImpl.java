@@ -1,15 +1,11 @@
 package org.insta.authentication.dao;
 
 import org.insta.authentication.dao.querybuilder.QueryBuilder;
-import org.insta.authentication.exception.ProfileCreationFailedException;
-import org.insta.authentication.exception.ProfileDeleteFailedException;
-import org.insta.authentication.exception.ProfileRetrivalFailedException;
-import org.insta.authentication.exception.ProfileUpdateFailedException;
+import org.insta.authentication.exception.*;
 import org.insta.authentication.model.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.insta.databaseconnection.DatabaseConnection;
-
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,15 +16,43 @@ import java.util.List;
  * Manage user accounts.
  * </p>
  *
+ * <p>
+ * This class implements the {@link UserAccountDAO} interface to provide functionality for managing user accounts, including creating, retrieving, updating, and deleting user profiles.
+ * </p>
+ *
+ * <p>
+ * It interacts with the database to perform operations related to user accounts and handles exceptions that may occur during these operations.
+ * </p>
+ *
+ * <p>
+ * The methods provided by this class allow for creating user profiles, updating profile information, retrieving profiles by ID, and deleting profiles.
+ * </p>
+ *
+ * <p>
+ * This class also contains methods to check for existing user credentials such as name, mobile number, and email address to avoid duplication.
+ * </p>
+ *
+ * <p>
+ * Singleton pattern is used to ensure that only one instance of this class is created throughout the application.
+ * </p>
+ *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see QueryBuilder
+ * @see UserAccountDAO
+ * @see User
+ * @see DatabaseConnection
+ * @see ProfileCreationFailedException
+ * @see ProfileUpdateFailedException
+ * @see ProfileRetrivalFailedException
+ * @see ProfileDeleteFailedException
  */
 public final class UserAccountDAOImpl implements UserAccountDAO {
 
-    private static UserAccountDAOImpl userAccountDAOImpl;
+    private static final Logger LOGGER = LogManager.getLogger(UserAccountDAOImpl.class);
+    private static UserAccountDAO userAccountDAOImpl;
     private final Connection connection;
     private final QueryBuilder queryBuilder;
-    private final Logger logger = LogManager.getLogger(UserAccountDAOImpl.class);
 
     /**
      * <p>
@@ -47,8 +71,8 @@ public final class UserAccountDAOImpl implements UserAccountDAO {
      *
      * @return Singleton instance of UserAccountDAOImpl.
      */
-    public static UserAccountDAOImpl getInstance() {
-        return userAccountDAOImpl == null ? userAccountDAOImpl = new UserAccountDAOImpl() : userAccountDAOImpl;
+    public static UserAccountDAO getInstance() {
+        return userAccountDAOImpl == null ? new UserAccountDAOImpl() : userAccountDAOImpl;
     }
 
     /**
@@ -56,17 +80,18 @@ public final class UserAccountDAOImpl implements UserAccountDAO {
      * Creates a user profile.
      * </p>
      *
-     * @param user {@link User} contains the user data.
+     * @param user The {@link User} object containing the user data.
      * @return The ID of the created user profile.
+     * @throws DatabaseOperationFailed If the profile creation operation fails due to a database error.
      */
-    public int createProfile(final User user){
+    public int createProfile(final User user) {
 
         user.setUserId(0);
-        try {
+        try (final PreparedStatement preparedStatement
+                     = connection.prepareStatement(queryBuilder.getCreateAccountQuery()
+                , Statement.RETURN_GENERATED_KEYS)) {
+
             connection.setAutoCommit(false);
-
-            final PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.getCreateAccountQuery(), Statement.RETURN_GENERATED_KEYS);
-
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getMobileNumber());
             preparedStatement.setString(3, user.getEmail());
@@ -74,16 +99,13 @@ public final class UserAccountDAOImpl implements UserAccountDAO {
 
             if (preparedStatement.executeUpdate() > 0) {
                 queryBuilder.setUserId(preparedStatement, user);
+                connection.commit();
                 return createAddress(user);
             }
 
         } catch (SQLException exception) {
-            try {
-                connection.rollback();
-            } catch (SQLException sqlException) {
-                throw new ProfileCreationFailedException("Roll back failed at account creation");
-            }
-            throw new ProfileCreationFailedException("Profile creation failed");
+            connectionRollback(connection);
+            throw new DatabaseOperationFailed("Database operation failed");
         }
 
         return user.getUserId();
@@ -94,11 +116,11 @@ public final class UserAccountDAOImpl implements UserAccountDAO {
      * Creates a user address.
      * </p>
      *
-     * @param user {@link User} contains the user data
-     * @return id of the created address otherwise return zero.
+     * @param user The {@link User} object containing the user data.
+     * @return The ID of the created user address.
      */
     private int createAddress(final User user) {
-        try(final PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.getCreateAddressQuery())) {
+        try (final PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.getCreateAddressQuery())) {
 
             preparedStatement.setInt(1, user.getAddress().getDoorNumber());
             preparedStatement.setString(2, user.getAddress().getState());
@@ -108,7 +130,8 @@ public final class UserAccountDAOImpl implements UserAccountDAO {
                 connection.commit();
                 return user.getUserId();
             }
-        } catch(Exception ignored) {
+        } catch (Exception ignored) {
+            throw new ProfileCreationFailedException("Address creation failed");
         }
         return user.getUserId();
     }
@@ -118,14 +141,15 @@ public final class UserAccountDAOImpl implements UserAccountDAO {
      * Updates a user profile.
      * </p>
      *
-     * @param user {@link User} contains the updated user data.
+     * @param user The {@link User} object containing the updated user data.
      * @return True if the user profile is successfully updated, otherwise false.
+     * @throws ProfileUpdateFailedException If the profile update operation fails.
      */
-    public int updateProfile(final User user) {
+    public boolean updateProfile(final User user) {
         final List<Object> list = new ArrayList<>();
 
         try (final PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.generateQuery(user, list)
-        , Statement.RETURN_GENERATED_KEYS)) {
+                , Statement.RETURN_GENERATED_KEYS)) {
             int index = 0;
 
             connection.setAutoCommit(false);
@@ -136,19 +160,14 @@ public final class UserAccountDAOImpl implements UserAccountDAO {
 
             if (preparedStatement.executeUpdate() > 0) {
                 connection.commit();
-                return queryBuilder.setUser(preparedStatement.getResultSet()).getUserId();
+                return true;
             }
+
+            return false;
         } catch (final SQLException exception) {
-
-            try {
-                connection.rollback();
-            } catch (SQLException sqlException) {
-                throw new ProfileUpdateFailedException("Roll back failed at account update");
-            }
-
+            connectionRollback(connection);
             throw new ProfileUpdateFailedException("Profile update failed");
         }
-        return 0;
     }
 
     /**
@@ -156,20 +175,22 @@ public final class UserAccountDAOImpl implements UserAccountDAO {
      * Retrieves a user profile by ID.
      * </p>
      *
-     * @param id contains the ID of the user profile.
+     * @param id The ID of the user profile to retrieve.
      * @return The user profile if found, null otherwise.
+     * @throws ProfileRetrivalFailedException If the profile retrieval operation fails.
      */
     public User getProfile(final int id) {
         try (final PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.getProfileQuery())) {
 
             connection.setAutoCommit(true);
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1, id);
 
             final ResultSet resultSet = preparedStatement.executeQuery();
 
             return queryBuilder.setUser(resultSet);
 
         } catch (SQLException exception) {
+            LOGGER.error("Profile retrival failed");
             throw new ProfileRetrivalFailedException("Profile retrival failed");
         }
     }
@@ -179,10 +200,11 @@ public final class UserAccountDAOImpl implements UserAccountDAO {
      * Deletes a user profile by ID.
      * </p>
      *
-     * @param id contains the ID of the user profile to be deleted.
+     * @param id The ID of the user profile to delete.
      * @return True if the user profile is successfully deleted, otherwise false.
+     * @throws ProfileDeleteFailedException If the profile
      */
-    public boolean deleteProfile(final int id) {
+    public Boolean deleteProfile(final int id) {
         try (final PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.getDeleteAccountQuery())) {
 
             connection.setAutoCommit(false);
@@ -193,31 +215,118 @@ public final class UserAccountDAOImpl implements UserAccountDAO {
                 connection.commit();
                 return true;
             }
+
+            return false;
         } catch (SQLException sqlException) {
-            try {
-                connection.rollback();
-            } catch (SQLException sqlException1) {
-                throw new ProfileDeleteFailedException("Roll back failed at profile deletion");
-            }
+            connectionRollback(connection);
+            LOGGER.error("Profile deletion failed");
             throw new ProfileDeleteFailedException("Profile deletion failed");
         }
-        return false;
     }
 
-    public boolean checkUserExists(final User user) {
-        try (final PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.checkUserExists()
-        , Statement.RETURN_GENERATED_KEYS)) {
+    /**
+     * <p>
+     * Checks if the given name is already registered in the database.
+     * </p>
+     *
+     * @param name The name to check.
+     * @return {@code true} if the name is already registered, {@code false} otherwise.
+     * @throws ProfileCreationFailedException If an error occurs during the database operation.
+     */
+    private boolean checkNameRegistered(final String name) {
+        try (final PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.checkNameExists()
+                , Statement.RETURN_GENERATED_KEYS)) {
 
-            if (user.getName() != null) preparedStatement.setString(1, user.getName());
-            if (user.getMobileNumber() != null) preparedStatement.setString(2, user.getMobileNumber());
-            if (user.getEmail() != null) preparedStatement.setString(3, user.getEmail());
+            preparedStatement.setString(1, name);
 
-            if (preparedStatement.executeUpdate() > 0) {
-               return true;
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                return resultSet.next();
+            }
+        } catch (SQLException sqlException) {
+            throw new ProfileCreationFailedException("Profile Creation failed");
+        }
+    }
+
+    /**
+     * <p>
+     * Checks if the given mobile number is already registered in the database.
+     * </p>
+     *
+     * @param mobile The mobile number to check.
+     * @return {@code true} if the mobile number is already registered, {@code false} otherwise.
+     * @throws ProfileCreationFailedException If an error occurs during the database operation.
+     */
+    private boolean checkMobileRegistered(final String mobile) {
+        try (final PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.checkMobileExists()
+                , Statement.RETURN_GENERATED_KEYS)) {
+
+            preparedStatement.setString(1, mobile);
+
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                return resultSet.next();
             }
         } catch (SQLException sqlException) {
             throw new ProfileCreationFailedException("Profile creation failed");
         }
-        return false;
+    }
+
+    /**
+     * <p>
+     * Checks if the given email address is already registered in the database.
+     * </p>
+     *
+     * @param email The email address to check.
+     * @return {@code true} if the email address is already registered, {@code false} otherwise.
+     * @throws ProfileCreationFailedException If an error occurs during the database operation.
+     */
+    private boolean checkEmailRegistered(final String email) {
+        try (final PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.checkEmailExists()
+                , Statement.RETURN_GENERATED_KEYS)) {
+
+            preparedStatement.setString(1, email);
+
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                return resultSet.next();
+            }
+        } catch (SQLException sqlException) {
+            throw new ProfileCreationFailedException("Profile creation failed");
+        }
+    }
+
+    /**
+     * <p>
+     * Generates a list of invalid credentials based on the provided user object.
+     * </p>
+     *
+     * @param user The user object containing the credentials to check.
+     * @return A list of strings representing invalid credentials.
+     */
+    public List<String> getCredentialsInvalidList(final User user) {
+        final List<String> credentialsInvalidList = new ArrayList<>();
+
+        if (checkNameRegistered(user.getName())) credentialsInvalidList.add("Name already registered");
+        if (checkMobileRegistered(user.getMobileNumber())) credentialsInvalidList.add("Mobile already registered");
+        if (checkEmailRegistered(user.getEmail())) credentialsInvalidList.add("Email already registered");
+
+        return credentialsInvalidList;
+    }
+
+    /**
+     * <p>
+     * Rolls back the database connection in case of a failed account creation.
+     * </p>
+     *
+     * @param connection The database connection to roll back.
+     * @throws ProfileCreationFailedException If rolling back the connection fails.
+     */
+    private void connectionRollback(final Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException sqlException) {
+            throw new ProfileCreationFailedException("Roll back failed at account creation");
+        }
     }
 }

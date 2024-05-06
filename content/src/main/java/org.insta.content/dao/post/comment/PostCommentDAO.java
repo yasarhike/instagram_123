@@ -4,31 +4,36 @@ import org.insta.content.model.Comment;
 
 /**
  * <p>
- * Manage post comments.
+ * Data Access Object interface for managing post comments.
+ * </p>
+ *
+ * <p>
+ * This interface provides methods for adding and deleting comments for a post.
  * </p>
  *
  * @author Mohamed Yasar
- * @version 1.0 6 Feb 2024
+ * @version 1.0, 6 Feb 2024
+ * @see PostCommentDAOImpl
  */
 public interface PostCommentDAO {
 
     /**
      * <p>
-     * Add a comment for the post.
+     * Adds a comment for the post.
      * </p>
      *
-     * @param comment {@link Comment}  Refers the id of the user.
-     * @return True if the comment is added successfully, otherwise false.
+     * @param comment the comment to be added
+     * @return the ID of the added comment, or 0 if unsuccessful
      */
     int postComment(final Comment comment);
 
     /**
      * <p>
-     * Delete a comment for the post.
+     * Deletes a comment for the post.
      * </p>
      *
-     * @param id Refers the commentId for the post.
-     * @return True if the comment is deleted successfully, otherwise false.
+     * @param id the ID of the comment to be deleted
+     * @return true if the comment is deleted successfully, otherwise false
      */
     boolean deleteComment(final int id);
 }

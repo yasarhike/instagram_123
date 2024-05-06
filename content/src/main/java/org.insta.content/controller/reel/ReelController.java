@@ -1,10 +1,10 @@
 package org.insta.content.controller.reel;
 
+import org.insta.content.dao.reel.ReelServiceDAO;
 import org.insta.content.dao.reel.ReelServiceDAOImpl;
 import org.insta.content.model.reel.Reel;
 
 import java.util.List;
-
 
 /**
  * <p>
@@ -13,11 +13,12 @@ import java.util.List;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see ReelServiceDAO
  */
 public final class ReelController {
 
     private static ReelController reelController;
-    private final ReelServiceDAOImpl reelServiceDAOImpl;
+    private final ReelServiceDAO reelServiceDAOImpl;
 
     /**
      * <p>
@@ -44,9 +45,8 @@ public final class ReelController {
      * Adds a reel for the specified user.
      * </p>
      *
-     * @param reel   Refer to the {@link Reel} of the user.
-     * @param userId The userId of the user adding the post.
-     * @return True if the reel is added successfully, otherwise false.
+     * @param reel Refers to the {@link Reel} of the user.
+     * @return id Refers the created id for the respective information.
      */
     public int addReel(final Reel reel) {
         return reelServiceDAOImpl.addReel(reel);
@@ -58,7 +58,6 @@ public final class ReelController {
      * </P>
      *
      * @param reelId Refer to reelId of the reel.
-     * @param userId The userId of the user removing the reel.
      * @return True if the reel is removed successfully, otherwise false.
      */
     public boolean removeReel(final Integer reelId) {
@@ -67,16 +66,24 @@ public final class ReelController {
 
     /**
      * <p>
-     * Displays all reels of the users.
+     * Retrieves all reels of the users.
      * </P>
      *
      * @param userId Refer to userId of the user.
-     * @return True if the reel is fetched successfully, otherwise false.
+     * @return list of reels related to the userId.
      */
     public List<Reel> display(final int userId) {
         return reelServiceDAOImpl.displayReel(userId);
     }
 
+    /**
+     * <p>
+     * Retrieves a specific reel of the users.
+     * </P>
+     *
+     * @param reelId Refer to userId of the user.
+     * @return reel related to the reelId.
+     */
     public Reel get(final int reelId) {
         return reelServiceDAOImpl.getReel(reelId);
     }

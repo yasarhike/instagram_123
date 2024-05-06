@@ -17,6 +17,7 @@ import java.util.List;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see StoryServiceDAO
  */
 public final class StoryServiceDAOImpl implements StoryServiceDAO {
 
@@ -41,11 +42,11 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
 
     /**
      * <p>
-     * Add a story of the user.
+     * Adds a story for the specified user.
      * </p>
      *
-     * @param story  {@link Story} Refers the story for the user.
-     * @return True if the like is added successfully, otherwise false.
+     * @param story The story to be added.
+     * @return The ID of the added story if successful, otherwise 0.
      */
     public int addStory(final Story story) {
         try (final PreparedStatement preparedStatement = connection
@@ -63,11 +64,19 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
                 return idSetter.setId(preparedStatement);
             }
 
-        } catch (final SQLException exception) {
+        } catch (final SQLException ignored) {
         }
         return 0;
     }
 
+    /**
+     * <p>
+     * Removes a story with the specified ID.
+     * </p>
+     *
+     * @param id The ID of the story to be removed.
+     * @return True if the story is successfully removed, otherwise false.
+     */
     public boolean removeStory(final int id) {
         try (final PreparedStatement preparedStatement = connection
                 .prepareStatement(String.join(" ", "DELETE FROM STORY where id = ? "))) {
@@ -83,6 +92,14 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
         return false;
     }
 
+    /**
+     * <p>
+     * Retrieves a story with the specified ID.
+     * </p>
+     *
+     * @param id The ID of the story to be retrieved.
+     * @return The retrieved story, or null if not found.
+     */
     public Story getStory(final int id) {
         final Story story = new Story();
 
@@ -99,6 +116,15 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
         return null;
     }
 
+    /**
+     * <p>
+     * Sets the unique details of a story from the given ResultSet.
+     * </p>
+     *
+     * @param story     The story object to set the details to.
+     * @param resultSet The ResultSet containing the story details.
+     * @return The story object with the unique details set, or null if not found.
+     */
     private Story setStoryUnique(final Story story, final ResultSet resultSet) {
         try {
             if (resultSet.next()) {
@@ -169,7 +195,7 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
             }
             return storys;
         } catch (final SQLException exception) {
-            logger.debug("Operation failed");
+            logger.debug("Operation Failed");
         }
         return storys;
     }
@@ -191,14 +217,21 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
                 , " left join story_share on story.id = story_share.story_id "
                 , " where story.user_id = ? "
                 , " group by story.id, account.id "
-                , " order by story.id;") ;
+                , " order by story.id;");
     }
 
+    /**
+     * <p>
+     * Gets the SQL query to fetch a unique story.
+     * </p>
+     *
+     * @return The SQL query for fetching a unique story.
+     */
     private String getUniqueStory() {
         return String.join(" ", "select story.id, story.user_id, account.name"
-               ,  ",  story.caption, story.is_private, story.music, story.created_at ,"
-               ,  " (SELECT COUNT(*) FROM story_like WHERE story_like.story_id = story.id)"
-               ,  " AS like_count, (SELECT COUNT(*) FROM story_share WHERE story_share.story_id = story.id) AS share_count"
-               ,  " from story left join account on account.id = story.user_id where story.id = ?;");
+                , ",  story.caption, story.is_private, story.music, story.created_at ,"
+                , " (SELECT COUNT(*) FROM story_like WHERE story_like.story_id = story.id)"
+                , " AS like_count, (SELECT COUNT(*) FROM story_share WHERE story_share.story_id = story.id) AS share_count"
+                , " from story left join account on account.id = story.user_id where story.id = ?;");
     }
 }

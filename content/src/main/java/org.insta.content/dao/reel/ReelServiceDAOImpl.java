@@ -1,8 +1,7 @@
 package org.insta.content.dao.reel;
 
-import org.insta.content.dao.hashtag.HashTagDAO;
-import org.insta.content.dao.hashtag.HashTagReels;
 import org.insta.content.dao.reel.query.QueryGenerator;
+import org.insta.content.model.common.IdSetter;
 import org.insta.content.model.reel.Reel;
 import org.insta.databaseconnection.DatabaseConnection;
 import org.apache.logging.log4j.LogManager;
@@ -19,14 +18,14 @@ import java.util.List;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see ReelServiceDAO
  */
 public final class ReelServiceDAOImpl implements ReelServiceDAO {
 
-    private static ReelServiceDAOImpl reelServiceDAOImpl;
+    private static ReelServiceDAO reelServiceDAOImpl;
     private final Connection connection;
     private final QueryGenerator queryGenerator;
-    private final HashTagDAO hashTag;
-    private final HashTagReels hashTagReels;
+    private final IdSetter idSetter;
     private final Logger LOGGER = LogManager.getLogger(ReelServiceDAOImpl.class);
 
     /**
@@ -37,8 +36,7 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
     private ReelServiceDAOImpl() {
         queryGenerator = QueryGenerator.getInstance();
         connection = DatabaseConnection.get();
-        hashTag = HashTagDAO.getInstance();
-        hashTagReels = HashTagReels.getInstance();
+        idSetter = IdSetter.getInstance();
     }
 
     /**
@@ -48,53 +46,43 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
      *
      * @return The singleton instance of ReelServiceDAOImpl class.
      */
-    public static ReelServiceDAOImpl getInstance() {
+    public static ReelServiceDAO getInstance() {
         return reelServiceDAOImpl == null ? reelServiceDAOImpl = new ReelServiceDAOImpl() : reelServiceDAOImpl;
     }
 
     /**
      * <p>
-     * Add a reel for the user account
+     * Adds a reel for the user account.
      * </p>
      *
-     * @param reel {@link Reel} Refers the reel for the user.
-     * @return True if the reel is added successfully, otherwise false.
+     * @param reel The reel to be added.
+     * @return The ID of the added reel if successful, otherwise 0.
      */
     @Override
     public int addReel(final Reel reel) {
         try (final PreparedStatement preparedStatement = connection.prepareStatement(String.join(" ",
                 "INSERT INTO REELS  (user_id, caption, duration) VALUES (?, ?, ?)"), Statement.RETURN_GENERATED_KEYS)) {
 
-            connection.setAutoCommit(false);
+            connection.setAutoCommit(true);
             preparedStatement.setInt(1, reel.getUserId());
             preparedStatement.setString(2, reel.getCaption());
             preparedStatement.setString(3, reel.getDuration());
 
-            hashTag.insertHashtags(reel.getHashTags());
-
-            if (preparedStatement.executeUpdate() > 0 && setReelId(preparedStatement, reel)) {
-                hashTagReels.insertHashtags(reel.getHashTags(), reel.getReelId());
-                connection.commit();
-
+            if (preparedStatement.executeUpdate() > 0) {
+                reel.setReelId(idSetter.setId(preparedStatement));
                 return reel.getReelId();
-            } else {
-                throw new SQLException();
             }
-        } catch (SQLException exception) {
-            try {
-                connection.rollback();
-            } catch (final SQLException ignored) {
-            }
+        } catch (SQLException ignored) {
         }
         return 0;
     }
 
     /**
      * <p>
-     * Deletes a reel for the user account
+     * Deletes a reel for the user account.
      * </p>
      *
-     * @param reelId Refers the reelId for the user.
+     * @param reelId The ID of the reel to be deleted.
      * @return True if the reel is deleted successfully, otherwise false.
      */
     public boolean removeReel(final int reelId) {
@@ -105,8 +93,7 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
             preparedStatement.setInt(1, reelId);
 
             return preparedStatement.executeUpdate() > 0;
-        } catch (final SQLException sqlException) {
-            LOGGER.debug("Operation failed");
+        } catch (final SQLException ignored) {
         }
 
         return false;
@@ -114,10 +101,10 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
 
     /**
      * <p>
-     * Update a reel for the user account
+     * Updates a reel for the user account.
      * </p>
      *
-     * @param reel {@link Reel}  Refers the reel for the user.
+     * @param reel The updated reel.
      * @return True if the reel is updated successfully, otherwise false.
      */
     public boolean updateReel(final Reel reel) {
@@ -157,11 +144,11 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
 
     /**
      * <p>
-     * Displays reel for the all user
+     * Retrieves all reels associated with a user.
      * </p>
      *
-     * @param userId Refers the userId of the user.
-     * @return List if the reel is fetched successfully, otherwise null.
+     * @param userId The ID of the user whose reels are to be retrieved.
+     * @return A list of reels associated with the user, or an empty list if none are found.
      */
     public List<Reel> displayReel(final int userId) {
         List<Reel> reels = null;
@@ -224,7 +211,7 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
                 , " reels.duration, (SELECT COUNT(*) FROM reel_like WHERE reel_like.reel_id = reels.id)"
                 , " AS like_count, (SELECT COUNT(*) FROM reel_comment WHERE reel_comment.reel_id = reels.id)"
                 , " AS comment_count, (SELECT COUNT(*) FROM reel_share WHERE reel_share.reel_id = reels.id) AS share_count"
-                , "from reels left join account on account.id = reels.user_id);");
+                , " from reels left join account on account.id = reels.user_id);");
     }
 
     /**
@@ -250,6 +237,14 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
         return false;
     }
 
+    /**
+     * <p>
+     * Retrieves a reel based on its ID.
+     * </p>
+     *
+     * @param reelId The ID of the reel to be retrieved.
+     * @return The retrieved reel, or null if not found.
+     */
     public Reel getReel(final int reelId) {
         final Reel reel = new Reel();
 
@@ -263,8 +258,17 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
         return null;
     }
 
+    /**
+     * <p>
+     * Sets unique properties of a reel based on the retrieved ResultSet.
+     * </p>
+     *
+     * @param reel      The reel object to be populated with unique properties.
+     * @param resultSet The ResultSet containing reel data.
+     * @return The populated reel object if successful, otherwise null.
+     */
     private Reel setReelUnique(final Reel reel, final ResultSet resultSet) {
-        try{
+        try {
             if (resultSet.next()) {
                 reel.setReelId(resultSet.getInt(1));
                 reel.setUserId(resultSet.getInt(2));
@@ -284,6 +288,13 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
         return null;
     }
 
+    /**
+     * <p>
+     * Generates the SQL query for retrieving a reel by its ID.
+     * </p>
+     *
+     * @return The SQL query string for retrieving a reel by its ID.
+     */
     public String reelGetQuery() {
         return String.join(" ", "select reels.id, reels.user_id, account.name,"
                 , " reels.caption, reels.is_private, reels.created_at,"

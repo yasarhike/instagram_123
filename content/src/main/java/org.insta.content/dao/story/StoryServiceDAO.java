@@ -14,16 +14,31 @@ public interface StoryServiceDAO {
 
     /**
      * <p>
-     * Add a story of the user.
+     * Adds a story for the specified user.
      * </p>
      *
-     * @param story  {@link Story} Refers the story for the user.
-     * @param userId Refers the userId of the user.
-     * @return True if the like is added successfully, otherwise false.
+     * @param story The story to be added.
+     * @return The ID of the added story if successful, otherwise 0.
      */
     int addStory(final Story story);
 
+    /**
+     * <p>
+     * Removes a story with the specified ID.
+     * </p>
+     *
+     * @param id The ID of the story to be removed.
+     * @return True if the story is successfully removed, otherwise false.
+     */
     boolean removeStory(final int id);
 
+    /**
+     * <p>
+     * Retrieves a story with the specified ID.
+     * </p>
+     *
+     * @param id The ID of the story to be retrieved.
+     * @return The retrieved story, or null if not found.
+     */
     Story getStory(final int id);
 }

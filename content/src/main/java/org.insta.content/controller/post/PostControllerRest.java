@@ -14,8 +14,9 @@ import javax.ws.rs.core.MediaType;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see PostService
  */
-@Path("/posts")
+@Path("/post")
 public final class PostControllerRest {
 
     private static PostControllerRest postControllerRest;
@@ -72,21 +73,6 @@ public final class PostControllerRest {
         return postService.removePost(postId);
     }
 
-    /**
-     * <p>
-     * Updates the post with the specified ID.
-     * </P>
-     *
-     * @param post Refer to {@link Post} of the user.
-     * @return True if the post is updated successfully, otherwise false.
-     */
-    @Path("/update")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @PUT
-    public byte[] updatePost(final Post post) {
-        return postService.updatePost(post);
-    }
 
     /**
      * <p>
@@ -100,6 +86,6 @@ public final class PostControllerRest {
     @Produces(MediaType.APPLICATION_JSON)
     @GET
     public byte[] getPost(@PathParam("id") final int postId) {
-       return postService.getPost(postId);
+        return postService.getPost(postId);
     }
 }

@@ -1,6 +1,7 @@
 package org.insta.content.controller.reel.comment;
 
 import org.insta.content.dao.reel.comment.ReelCommentDAO;
+import org.insta.content.dao.reel.comment.ReelCommentDAOImpl;
 import org.insta.content.model.Comment;
 
 /**
@@ -8,13 +9,14 @@ import org.insta.content.model.Comment;
  * Controller class responsible for managing comments on reels.
  * </p>
  *
+ * @see ReelCommentDAO
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
  */
 public final class ReelCommentController {
 
     private static ReelCommentController commentController;
-    private final ReelCommentDAO reelCommentDAO;
+    private final ReelCommentDAO reelCommentDAOImpl;
 
     /**
      * <p>
@@ -22,7 +24,7 @@ public final class ReelCommentController {
      * </p>
      */
     private ReelCommentController() {
-        reelCommentDAO = ReelCommentDAO.getInstance();
+        reelCommentDAOImpl = ReelCommentDAOImpl.getInstance();
     }
 
     /**
@@ -41,12 +43,11 @@ public final class ReelCommentController {
      * Adds a comment to the specified post.
      * </p>
      *
-     * @param reelId  Refers the reelId of the reel to which the comment will be added.
      * @param comment Refers the comment to be added.
-     * @return True if the comment is successfully added, false otherwise.
+     * @return id Refers the created id for the comment.
      */
     public int add(final Comment comment) {
-        return reelCommentDAO.addComment(comment);
+        return reelCommentDAOImpl.addComment(comment);
     }
 
     /**
@@ -54,10 +55,9 @@ public final class ReelCommentController {
      * Removes comments associated with the specified post.
      * </p>
      *
-     * @param reelId Refers the reelId of the reel from which comments will be removed.
      * @return True if comments are successfully removed, otherwise false.
      */
     public boolean deleteComment(final int commentId) {
-        return reelCommentDAO.deleteComment(commentId);
+        return reelCommentDAOImpl.deleteComment(commentId);
     }
 }

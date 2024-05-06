@@ -4,11 +4,16 @@ import org.insta.content.model.post.Post;
 
 /**
  * <p>
- * Managing post service operations.
+ * Service interface for managing post operations.
  * </p>
  *
+ * <p>
+ * This interface provides methods for adding, removing, and retrieving posts.
+ * </p>
+ *
+ * @see PostServiceImpl
  * @author Mohamed Yasar
- * @version 1.0 6 Feb 2024
+ * @version 1.0, 6 Feb 2024
  */
 public interface PostService {
 
@@ -17,38 +22,28 @@ public interface PostService {
      * Adds a post for the specified user.
      * </p>
      *
-     * @param post   Refer to the post to the user.
-     * @return True if the post is added successfully, otherwise false.
+     * @param post the post to be added
+     * @return a byte array representing the result of the operation
      */
-     byte[] addPost(final Post post);
+    byte[] addPost(final Post post);
 
     /**
      * <p>
-     * Removes a post with the specified ID for the specified user.
-     * </P>
+     * Removes a post with the specified ID.
+     * </p>
      *
-     * @param postId Refer to id of the post.
-     * @return True if the post is removed successfully, otherwise false.
+     * @param postId the ID of the post to be removed
+     * @return a byte array representing the result of the operation
      */
-     byte[] removePost(final int postId);
+    byte[] removePost(final int postId);
 
     /**
      * <p>
-     * get a post with the specified ID for the specified user.
-     * </P>
+     * Retrieves a post with the specified ID.
+     *</p>
      *
-     * @param id Refer to id of the post.
-     * @return True if the post is removed successfully, otherwise false.
+     * @param id the ID of the post to be retrieved
+     * @return a byte array representing the retrieved post
      */
-     byte[] getPost(final int id);
-
-    /**
-     * <p>
-     * Update a post with the specified ID for the specified user.
-     * </P>
-     *
-     * @param post {@link Post} Refer to post of the user want to update.
-     * @return True if the post is removed successfully, otherwise false.
-     */
-     byte[] updatePost(final Post post);
+    byte[] getPost(final int id);
 }

@@ -1,21 +1,30 @@
 package org.insta.content.service.reel;
 
+import org.insta.content.dao.reel.ReelServiceDAO;
+import org.insta.content.dao.reel.ReelServiceDAOImpl;
+import org.insta.content.groups.ReelValidator;
 import org.insta.content.model.reel.Reel;
-import org.insta.content.service.home.content.ContentServiceImpl;
-
-import java.util.Map;
+import org.insta.wrapper.jsonvalidator.ObjectValidator;
 
 /**
  * <p>
  * Implementation class for managing reels.
  * </p>
  *
+ * <p>
+ * This class provides methods to add, remove, and retrieve reels for users.
+ * </p>
+ *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see ReelService
+ * @see ReelServiceDAO
+ * @see ObjectValidator
  */
-public final class ReelServiceImpl {
-    private static ReelServiceImpl reelServiceImpl;
-    public final ContentServiceImpl<Reel> reelService;
+public final class ReelServiceImpl implements ReelService {
+    private static ReelService reelServiceImpl;
+    private final ReelServiceDAO reelServiceDAO;
+    private final ObjectValidator objectValidator;
 
     /**
      * <p>
@@ -23,7 +32,8 @@ public final class ReelServiceImpl {
      * </p>
      */
     private ReelServiceImpl() {
-        reelService = new ContentServiceImpl<>();
+        reelServiceDAO = ReelServiceDAOImpl.getInstance();
+        objectValidator = ObjectValidator.getInstance();
     }
 
     /**
@@ -33,48 +43,49 @@ public final class ReelServiceImpl {
      *
      * @return The singleton instance of ReelServiceImplementation class.
      */
-    public static ReelServiceImpl getInstance() {
-        if (reelServiceImpl == null) {
-            reelServiceImpl = new ReelServiceImpl();
-        }
-        return reelServiceImpl;
+    public static ReelService getInstance() {
+        return reelServiceImpl == null ? new ReelServiceImpl() : reelServiceImpl;
     }
 
     /**
      * <p>
-     * Adds a reel for the specified user and set the timestamp.
+     * Adds a reel for the specified user.
      * </p>
      *
-     * @param reel   Refer to the {@link Reel} of the user.
-     * @param userId Refer the userId of the user adding the post.
-     * @return True if the reel is added successfully, otherwise false.
+     * @param reel The reel to add.
+     * @return A byte array representing either validation violations or a success response.
+     * @see Reel
      */
-    public boolean addReel(final Reel reel, final Integer userId) {
-        reel.setReelId(ContentServiceImpl.getContentCount());
-        return reelService.add(reel, userId);
+    public byte[] addReel(final Reel reel) {
+        final byte[] violations = objectValidator.validate(reel, ReelValidator.class);
+
+        return violations.length > 0 ? violations
+                : objectValidator.forSuccessResponse(reelServiceDAO.addReel(reel), violations);
     }
 
     /**
      * <p>
-     * Removes a reel with the specified ID for the specified user.
-     * </P>
-     *
-     * @param reelId Refer to reelId of the reel.
-     * @param userId Refer the userId of the user removing the reel.
-     * @return True if the reel is removed successfully, otherwise false.
-     */
-    public boolean removeReel(final int reelId, final Integer userId) {
-        return reelService.remove(reelId, userId);
-    }
-
-    /**
-     * <p>
-     * Retrieves all reels.
+     * Removes a reel with the specified ID.
      * </p>
      *
-     * @return Map contains the user reels.
+     * @param reelId The ID of the reel to remove.
+     * @return A byte array representing a manual response.
      */
-    public Map<Integer, Map<Integer, Reel>> getReel() {
-        return reelService.getContent();
+    public byte[] removeReel(final int reelId) {
+        return objectValidator.manualResponse(reelServiceDAO.removeReel(reelId));
+    }
+
+    /**
+     * <p>
+     * Retrieves a reel with the specified ID.
+     * </p>
+     *
+     * @param reelId The ID of the reel to retrieve.
+     * @return A byte array representing the retrieved reel.
+     */
+    public byte[] getReel(final int reelId) {
+        final Reel reel = reelServiceDAO.getReel(reelId);
+        return reel != null ? objectValidator.objectResponse(reel)
+                : objectValidator.manualResponse(false);
     }
 }

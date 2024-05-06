@@ -2,32 +2,36 @@ package org.insta.content.dao.post.like;
 
 /**
  * <p>
- * Manage post like.
+ * Data Access Object interface for managing post likes.
+ * </p>
+ *
+ * <p>
+ * This interface provides methods for adding and removing likes for a post.
  * </p>
  *
  * @author Mohamed Yasar
- * @version 1.0 6 Feb 2024
+ * @version 1.0, 6 Feb 2024
  */
 public interface PostLikeDAO {
 
     /**
      * <p>
-     * Add a like for a post.
+     * Adds a like for a post.
      * </p>
      *
-     * @param postId Refers the postId for the user.
-     * @return True if the like is added successfully, otherwise false.
+     * @param userId the ID of the user adding the like
+     * @param postId the ID of the post to be liked
+     * @return the ID of the added like, or 0 if unsuccessful
      */
-     int postLike(final int userId, final int postId);
+    int postLike(final int userId, final int postId);
 
     /**
      * <p>
-     * Unlike a particular post
+     * Removes a like for a post.
      * </p>
      *
-     * @param postId Refers the postId for the post.
-     * @param userId Refers the userId for the user.
-     * @return True if the like is added successfully, otherwise false.
+     * @param postId the ID of the post from which the like is to be removed
+     * @return true if the like is removed successfully, otherwise false
      */
-     boolean postUnlike(final int userId, final int postId);
+    boolean postUnlike(final int postId);
 }

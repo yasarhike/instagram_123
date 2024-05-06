@@ -43,9 +43,8 @@ public final class StoryController {
      * Adds a story for the specified user.
      * </p>
      *
-     * @param story  Refer to the {@link Story} of the user.
-     * @param userId The userId of the user adding the story.
-     * @return True if the story is added successfully, otherwise false.
+     * @param story the Story object to add
+     * @return the ID of the added story if successful, otherwise -1
      */
     public int addStory(final Story story) {
         return storyServiceDAOImpl.addStory(story);
@@ -53,24 +52,23 @@ public final class StoryController {
 
     /**
      * <p>
-     * Removes a reel with the specified ID for the specified user.
-     * </P>
+     * Removes a story with the specified ID.
+     * </p>
      *
-     * @param storyId Refer to id of the story.
-     * @param userId  The userId of the user removing the story.
-     * @return True if the story is removed successfully, otherwise false.
+     * @param storyId the ID of the story to remove
+     * @return true if the story is removed successfully, otherwise false
      */
-    public boolean removeStory(final Integer storyId) {
+    public boolean removeStory(final int storyId) {
         return false;
     }
 
     /**
      * <p>
-     * Displays a reel with the specified ID for the specified user.
-     * </P>
+     * Displays stories for the specified user.
+     * </p>
      *
-     * @param userId Refer to id of the story.
-     * @return True if the story data is fetched successfully, otherwise false.
+     * @param userId the ID of the user whose stories to display
+     * @return a list of stories belonging to the specified user
      */
     public List<Story> displayStory(final int userId) {
         return storyServiceDAOImpl.displayStory(userId);

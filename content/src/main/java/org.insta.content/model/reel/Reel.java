@@ -4,20 +4,24 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.insta.content.groups.ReelValidator;
-import org.insta.content.model.Comment;
 import org.insta.content.model.common.Common;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * <p>
- * Contain the reel details of the user.
+ * Represents a Reel.
+ * </p>
+ *
+ * <p>
+ * This class defines properties for a reel, including the reel ID, user ID,
+ * content ID, and the reel itself.
  * </p>
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see Common
  */
 public final class Reel extends Common {
 
@@ -103,6 +107,10 @@ public final class Reel extends Common {
         this.isPrivate = isPrivate;
     }
 
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
+
     public int getTotal_comment() {
         return total_comment;
     }
@@ -131,37 +139,7 @@ public final class Reel extends Common {
         return hashTags;
     }
 
-    public void setPrivate(boolean aPrivate) {
-        isPrivate = aPrivate;
-    }
-
     public void setHashTags(List<String> hashTags) {
         this.hashTags = hashTags;
-    }
-    public void setHashTags(final String hashTags) {
-        String[] tagsArray = hashTags.split("#");
-        this.hashTags = new ArrayList<>();
-
-        for (final String tag : tagsArray) {
-            final String trimmedTag = tag.trim();
-            if (!trimmedTag.isEmpty()) {
-                this.hashTags.add(trimmedTag);
-            }
-        }
-    }
-
-    public String toString() {
-
-        return (String.join(" "
-                , "\nReel id", Integer.toString(this.getReelId())
-                , "\nAuthor : ", this.getUserName()
-                , "\nCaption : ", this.getCaption()
-                , "\nDuration : ", this.getDuration()
-                , "\nTimeStamp : ", this.getTimestamp().toString()
-                , "\nTotalLikes : ", Integer.toString(this.getTotal_likes())
-                , "\nTotalComments : ", Integer.toString(this.getTotal_comment())
-                , "\nTotalShares : ", Integer.toString(this.getTotal_shares())
-                , "\n")
-        );
     }
 }

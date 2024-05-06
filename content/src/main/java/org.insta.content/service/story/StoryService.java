@@ -1,14 +1,22 @@
 package org.insta.content.service.story;
 
+import org.insta.content.groups.StoryValidator;
 import org.insta.content.model.story.Story;
 
 /**
  * <p>
- * managing story service operation.
+ * manage stories.
+ * </p>
+ *
+ * <p>
+ * Provides methods to add, remove, and retrieve stories for users.
  * </p>
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see StoryService
+ * @see Story
+ * @see StoryValidator
  */
 public interface StoryService {
 
@@ -17,20 +25,29 @@ public interface StoryService {
      * Adds a story for the specified user.
      * </p>
      *
-     * @param story  Refer to the {@link Story} of the user.
-     * @param userId Refer the userId of the user adding the story.
-     * @return True if the story is added successfully, otherwise false.
+     * @param story The story to add.
+     * @return A byte array representing either validation violations or a success response.
+     * @see Story
      */
-    boolean addStory(final Story story, final Integer userId);
+    byte[] addStory(final Story story);
 
     /**
      * <p>
-     * Removes a reel with the specified ID for the specified user.
-     * </P>
+     * Removes a story with the specified ID.
+     * </p>
      *
-     * @param storyId Refer to id of the story.
-     * @param userId  Refer the userId of the user removing the story.
-     * @return True if the story is removed successfully, otherwise false.
+     * @param storyId The ID of the story to remove.
+     * @return A byte array representing a manual response.
      */
-    boolean removeStory(final int storyId, final Integer userId);
+    byte[] removeStory(final int storyId);
+
+    /**
+     * <p>
+     * Retrieves a story with the specified ID.
+     * </p>
+     *
+     * @param storyId The ID of the story to retrieve.
+     * @return A byte array representing the retrieved story.
+     */
+    byte[] getStory(final int storyId);
 }

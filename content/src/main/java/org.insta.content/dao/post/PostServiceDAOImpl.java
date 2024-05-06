@@ -1,6 +1,5 @@
 package org.insta.content.dao.post;
 
-import org.insta.content.dao.post.like.PostLikeDAOImpl;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
 import org.apache.logging.log4j.LogManager;
@@ -14,19 +13,23 @@ import java.util.List;
 
 /**
  * <p>
- * Managing user post.
+ * Implementation of the PostServiceDAO interface for managing user posts.
+ * </p>
+ *
+ * <p>
+ * This class provides methods to add, remove, update, and retrieve posts for users.
  * </p>
  *
  * @author Mohamed Yasar
- * @version 1.0 6 Feb 2024
+ * @version 1.0, 6 Feb 2024
+ * @see PostServiceDAO
  */
 public final class PostServiceDAOImpl implements PostServiceDAO {
 
+    private static final Logger LOGGER = LogManager.getLogger(PostServiceDAOImpl.class);
     private static PostServiceDAOImpl postServiceDAOImpl;
     private final Connection connection;
-    private final PostLikeDAOImpl postLikeDAOImpl;
     private final IdSetter idSetter;
-    private static final Logger LOGGER =  LogManager.getLogger(PostServiceDAOImpl.class);
 
     /**
      * <p>
@@ -35,7 +38,6 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
      */
     private PostServiceDAOImpl() {
         connection = DatabaseConnection.get();
-        postLikeDAOImpl = PostLikeDAOImpl.getInstance();
         idSetter = IdSetter.getInstance();
     }
 
@@ -52,11 +54,11 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
 
     /**
      * <p>
-     * Post a video or image for the user account
+     * Posts a video or image for the user account.
      * </p>
      *
-     * @param post {@link Post} Refers the post for the user.
-     * @return True if the post is added successfully, otherwise false.
+     * @param post the post to be added
+     * @return the ID of the added post, or 0 if unsuccessful
      */
     public int addPost(final Post post) {
         try (final PreparedStatement preparedStatement = connection
@@ -74,7 +76,7 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
             }
 
         } catch (SQLException sqlException) {
-            LOGGER.debug("Operation failed");
+            LOGGER.debug("Operation Failed");
         }
 
         return 0;
@@ -82,12 +84,11 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
 
     /**
      * <p>
-     * Deletes a post for the user account
+     * Deletes a post for the user account.
      * </p>
      *
-     * @param postId Refers the postId for the user.
-     * @param userId Refers the userId for the user.
-     * @return True if the post is updated successfully, otherwise false.
+     * @param id the ID of the post to be removed
+     * @return true if the post is removed successfully, otherwise false
      */
     public boolean removePost(final int id) {
         try (final PreparedStatement preparedStatement = connection
@@ -106,11 +107,11 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
 
     /**
      * <p>
-     * Update a post for the user account
+     * Updates a post for the user account.
      * </p>
      *
-     * @param post {@link Post}  Refers the post for the user.
-     * @return True if the post is updated successfully, otherwise false.
+     * @param post the updated post
+     * @return true if the post is updated successfully, otherwise false
      */
     public boolean updatePost(final Post post) {
         try {
@@ -143,20 +144,20 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
 
     /**
      * <p>
-     * Displays a post for the all user
+     * Displays posts for all users.
      * </p>
      *
-     * @param id Refers the userId of the user.
-     * @return List if the post is fetched successfully, otherwise null.
+     * @param id the ID of the user
+     * @return a list of posts if fetched successfully, otherwise null
      */
     public List<Post> displayPost(final int id) {
         List<Post> posts = null;
 
         try (final PreparedStatement preparedStatement = DatabaseConnection.get()
-                .prepareStatement(getPostDisplayQuery())) {
+                .prepareStatement(getPostDisplayQuery(), Statement.RETURN_GENERATED_KEYS)) {
             posts = new ArrayList<>();
 
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1, id);
             final ResultSet resultSet = preparedStatement.executeQuery();
 
             return setPost(resultSet, posts);
@@ -194,8 +195,7 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
                 posts.add(post);
             }
             return posts;
-        } catch (final SQLException exception) {
-            LOGGER.debug("Operation failed");
+        } catch (final SQLException ignored) {
         }
         return null;
     }
@@ -209,17 +209,22 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
      */
     public String getPostDisplayQuery() {
         return String.join(" ", "select post.id, post.user_id, account.name"
-                , " , post.caption, post.type, post.is_private, post.created_at, count(post_like.post_id),"
-                , " count(post_comment.post_id), count(post_share.post_id) from post"
+                , " , post.caption, post.type, post.is_private, post.created_at,"
+                , "(SELECT COUNT(*) FROM post_like WHERE post_like.post_id = post.id), "
+                , " (SELECT COUNT(*) FROM post_comment WHERE post_comment.post_id = post.id), "
+                , "(SELECT COUNT(*) FROM post_share WHERE post_share.post_id = post.id) from post "
                 , " left join account on account.id = post.user_id"
-                , " left join post_like on post.id = post_like.post_id"
-                , " left join post_comment on post.id = post_comment.post_id"
-                , " left join post_share on post.id = post_share.post_id"
-                , " where post.user_id = ? "
-                , " group by post.id, account.id, "
-                , " order by post.id;");
+                , " where post.user_id = ? ");
     }
 
+    /**
+     * <p>
+     * Retrieves a post with the specified ID.
+     * </p>
+     *
+     * @param postId the ID of the post to be retrieved
+     * @return the retrieved post, or null if not found
+     */
     public Post getPost(final int postId) {
         try (final PreparedStatement preparedStatement = connection.prepareStatement(reelGetQuery())) {
             preparedStatement.setInt(1, postId);
@@ -231,7 +236,15 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
         return null;
     }
 
-    private Post setReelUnique( final ResultSet resultSet) {
+    /**
+     * <p>
+     * Sets the details of a post retrieved from the database ResultSet.
+     * </p>
+     *
+     * @param resultSet The ResultSet containing post details
+     * @return The Post object with retrieved details, or null if no data found
+     */
+    private Post setReelUnique(final ResultSet resultSet) {
         final Post post = new Post();
         try {
             if (resultSet.next()) {
@@ -247,17 +260,23 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
                 post.setShareCount(resultSet.getInt(10));
                 return post;
             }
-        } catch (final SQLException exception) {
-            LOGGER.debug("Operation failed");
+        } catch (final SQLException ignored) {
         }
         return null;
     }
 
+    /**
+     * <p>
+     * Generates the SQL query to retrieve post details.
+     * </p>
+     *
+     * @return The SQL query to fetch post details
+     */
     private String reelGetQuery() {
         return String.join(" ", "select post.id, post.user_id, account.name,",
                 " post.caption, post.type, post.is_private, post.created_at,(SELECT COUNT(*) FROM post_like WHERE post_like.post_id = post.id)",
                 " AS like_count, (SELECT COUNT(*) FROM post_comment WHERE post_comment.post_id = post.id)",
                 " AS comment_count, (SELECT COUNT(*) FROM post_share WHERE post_share.post_id = post.id) AS share_count",
-                " from post left join account on account.id = post.user_id where post.id = ?;");
+                " from post left join account on account.id = post.user_id where post.user_id = ?;");
     }
 }

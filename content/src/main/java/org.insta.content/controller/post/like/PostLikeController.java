@@ -9,6 +9,7 @@ import org.insta.content.dao.post.like.PostLikeDAOImpl;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see PostLikeDAOImpl
  */
 public final class PostLikeController {
 
@@ -54,10 +55,9 @@ public final class PostLikeController {
      * </p>
      *
      * @param userId Refer to the userId of the user.
-     * @param postId Refer the postId of the post.
      * @return True if the like is removed successfully, otherwise false.
      */
     public boolean postUnlike(final int userId, final int postId) {
-        return postLikeDAOImpl.postUnlike(userId, postId);
+        return postLikeDAOImpl.postUnlike(postId);
     }
 }

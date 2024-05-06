@@ -1,7 +1,6 @@
 package org.insta.content.controller.story.like;
 
 import org.insta.content.dao.story.like.StoryLikeDAOImpl;
-import org.insta.content.view.story.like.StoryLikeView;
 
 /**
  * <p>
@@ -54,7 +53,6 @@ public final class StoryLikeController {
      * Updates a post with the specified ID.
      * </P>
      *
-     * @param userId  Refer to id of the user.
      * @param storyId Refer the id of the story.
      * @return True if the like is removed successfully, otherwise false.
      */

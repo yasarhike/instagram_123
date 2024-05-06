@@ -1,7 +1,9 @@
 package org.insta.authentication.controller;
 
+import org.insta.authentication.dao.UserAccountDAO;
 import org.insta.authentication.dao.UserAccountDAOImpl;
 import org.insta.authentication.model.User;
+import org.insta.authentication.service.UserAccountService;
 import org.insta.authentication.service.UserAccountServiceImplementation;
 
 /**
@@ -10,14 +12,22 @@ import org.insta.authentication.service.UserAccountServiceImplementation;
  * retrieval, updating, and deletion.
  * </p>
  *
+ * <p>
+ * This class acts as a controller for user account operations, providing methods to create, retrieve,
+ * update, and delete user profiles. It delegates the actual implementation to the {@link UserAccountService}
+ * and {@link UserAccountDAO} interfaces.
+ * </p>
+ *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see UserAccountService
+ * @see UserAccountDAO
  */
 public final class UserAccountController {
 
     private static UserAccountController profileController;
-    private final UserAccountDAOImpl userAccountDAOImpl;
-    private final UserAccountServiceImplementation userAccountServiceImplementation;
+    private final UserAccountDAO userAccountDAOImpl;
+    private final UserAccountService userAccountServiceImplementation;
 
     /**
      * <p>
@@ -37,7 +47,7 @@ public final class UserAccountController {
      * @return Singleton instance of UseAccountController class.
      */
     public static UserAccountController getInstance() {
-        return profileController == null ? profileController = new UserAccountController() : profileController;
+        return profileController == null ? new UserAccountController() : profileController;
     }
 
     /**

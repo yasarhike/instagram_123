@@ -1,104 +1,180 @@
 package org.insta.wrapper.jsonvalidator;
 
+import org.insta.wrapper.exception.ExternalLibraryException;
 import org.insta.wrapper.hibernate.*;
-import org.insta.wrapper.jackson.ObjectParser;
-import org.insta.wrapper.jackson.JsonObject;
+import org.insta.wrapper.jackson.MapperObject;
+import org.insta.wrapper.jackson.NodeArray;
+import org.insta.wrapper.jackson.NodeObject;
 
-public final class ObjectValidator<T,V> {
+import java.util.Objects;
+
+/**
+ * <p>
+ * Utility class for validating objects and generating response payloads.
+ * </p>
+ *
+ * <p>
+ * This class provides methods for validating objects, generating success and failure
+ * response payloads, and manual response payloads for various scenarios.
+ * </p>
+ *
+ * @author Mohamed Yasar
+ * @version 1.0 6 Feb 2024
+ * @see Validate
+ * @see MapperObject
+ * @see NodeObject
+ * @see NodeArray
+ */
+public final class ObjectValidator {
 
     private static ObjectValidator objectValidator;
     private final Validate validate;
 
-    public ObjectValidator() {
+    /**
+     * <p>
+     * Constructs an ObjectValidator instance and initializes the Validate instance.
+     * </p>
+     */
+    private ObjectValidator() {
         validate = Validate.getInstance();
     }
 
-    public ObjectValidator getInstance() {
+
+    /**
+     * <p>
+     * Returns the singleton instance of ObjectValidator.
+     * </p>
+     *
+     * @return The singleton instance of ObjectValidator.
+     */
+    public static ObjectValidator getInstance() {
         return objectValidator == null ? new ObjectValidator() : objectValidator;
     }
 
-    public byte[] validate(final T object, final Class<?> groups) {
+
+    /**
+     * <p>
+     * Validates the specified object against the specified validation groups and
+     * returns the validation result as a byte array.
+     * </p>
+     *
+     * @param <T>    The type of the object to validate.
+     * @param object The object to validate.
+     * @param groups The validation groups to apply.
+     * @return The validation result as a byte array.
+     */
+    public <T> byte[] validate(final T object, final Class<?> groups) {
         try {
-            final ObjectParser objectParser = new ObjectParser();
-            final org.insta.wrapper.jackson.JsonObject jsonObject = objectParser.getObjectNode();
+            final MapperObject mapperObject = new MapperObject();
+            final NodeObject nodeObject = mapperObject.getObjectNode();
 
-            validate.validate(object, groups).forEach(violation -> jsonObject.objectNode().put(violation.getPropertyPath().toString(), violation.getMessage()));
+            validate.validate(object, groups).forEach(violation -> nodeObject.objectNode().put(violation.getPropertyPath().toString(), violation.getMessage()));
 
-            return !jsonObject.objectNode().isEmpty() ? objectParser.getObjectMapper().writeValueAsString(jsonObject.objectNode()).getBytes() : new byte[]{};
-        } catch (Exception ignored) {
+            return !nodeObject.objectNode().isEmpty() ? mapperObject.getObjectMapper().writeValueAsString(nodeObject.objectNode()).getBytes() : new byte[]{};
+        } catch (Exception exception) {
+            throw new ExternalLibraryException("Parse Operation failed");
         }
-
-        return new byte[]{};
     }
 
+    /**
+     * <p>
+     * Generates a success response payload with the specified table ID and violations data.
+     * </p>
+     *
+     * @param tableId    The ID of the table.
+     * @param violations The violations data.
+     * @return The success response payload as a byte array.
+     */
     public byte[] forSuccessResponse(final int tableId, final byte[] violations) {
         try {
-            final ObjectParser objectParser = new ObjectParser();
-            final JsonObject response = objectParser.getObjectNode();
-            final JsonObject tableData = objectParser.getObjectNode();
+            final MapperObject mapperObject = new MapperObject();
+            final NodeObject response = mapperObject.getObjectNode();
+            final NodeObject tableData = mapperObject.getObjectNode();
+            final NodeArray nodeArray = mapperObject.getArrayNode();
 
             if (tableId != 0) {
-                tableData.putNode("table id", tableId);
+                tableData.putNode("id", tableId);
             } else {
-                tableData.putNode("status", "wrong credentials");
+                tableData.putNode("status", "invalid credentials");
             }
+
             response.setValue("data", tableData.objectNode());
-            response.setValue("Violations ", objectParser.readTree(violations));
+            response.setValue("Violations ", mapperObject.readTree(violations));
 
-            return objectParser.writeValueAsString(response).getBytes();
+            nodeArray.add(response.objectNode());
+
+            return mapperObject.writeValueAsString(nodeArray.getArrayNode()).getBytes();
         } catch (Exception ignored) {
+            throw new ExternalLibraryException("Parse operation failed");
         }
-        return new byte[]{};
     }
 
-    public byte[] forFailureResponse(final byte[] violations, final Boolean result) {
+    /**
+     * <p>
+     * Generates a response payload for the specified object.
+     * </p>
+     *
+     * @param <T>    The type of the object.
+     * @param object The object.
+     * @return The response payload as a byte array.
+     */
+    public <T> byte[] objectResponse(final T object) {
+        if (Objects.isNull(object)) return stringManualResponse("User not found");
         try {
-            final ObjectParser objectParser = new ObjectParser();
-            final JsonObject response = objectParser.getObjectNode();
-            final JsonObject tableData = objectParser.getObjectNode();
+            final MapperObject mapperObject = new MapperObject();
 
-            tableData.putValue("status", result);
-            response.setValue("data", tableData.objectNode());
-            response.setValue("Violations ", objectParser.readTree(violations));
-
-            return objectParser.writeValueAsString(response).getBytes();
+            return mapperObject.writeValueAsString(object).getBytes();
         } catch (Exception ignored) {
+            throw new ExternalLibraryException("Parse operation failed");
         }
-        return new byte[]{};
     }
 
-    public byte[] objectResponse(final T object) {
-        if (object == null) manualResponse(false);
-        try {
-            final ObjectParser objectParser = new ObjectParser();
-
-            return objectParser.writeValueAsString(object).getBytes();
-        } catch (Exception ignored) {
-        }
-        return new byte[] {};
-    }
-
+    /**
+     * <p>
+     * Generates a manual response payload with the specified result.
+     * </p>
+     *
+     * @param result The result of the operation.
+     * @return The manual response payload as a byte array.
+     */
     public byte[] manualResponse(final boolean result) {
         try {
-            final ObjectParser objectParser = new ObjectParser();
-            final JsonObject response = objectParser.getObjectNode();
+            final MapperObject mapperObject = new MapperObject();
+            final NodeArray nodeArray = mapperObject.getArrayNode();
+            final NodeObject nodeObject = mapperObject.getObjectNode();
+            if (result) {
+                nodeObject.put("status", "successful");
+            } else {
+                nodeObject.put("status", "Failed");
+            }
+            nodeArray.add(nodeObject.objectNode());
 
-            response.putValue("status", result);
-            return objectParser.writeValueAsString(response).getBytes();
+            return mapperObject.writeValueAsString(nodeArray.getArrayNode()).getBytes();
         } catch (Exception ignored) {
+            throw new ExternalLibraryException("Parse operation failed");
         }
-        return new byte[] {};
     }
 
+    /**
+     * <p>
+     * Generates a manual response payload with the specified result as a string.
+     * </p>
+     *
+     * @param result The result string.
+     * @return The manual response payload as a byte array.
+     */
     public byte[] stringManualResponse(final String result) {
         try {
-            final ObjectParser objectParser = new ObjectParser();
-            final JsonObject response = objectParser.getObjectNode();
+            final MapperObject mapperObject = new MapperObject();
+            final NodeArray nodeArray = mapperObject.getArrayNode();
+            final NodeObject nodeObject = mapperObject.getObjectNode();
 
-            response.putValue("status", result);
-            return objectParser.writeValueAsString(response).getBytes();
-        } catch (Exception ignored) {
+            nodeObject.put("status", result);
+            nodeArray.add(nodeObject.objectNode());
+
+            return mapperObject.writeValueAsString(nodeArray.getArrayNode()).getBytes();
+        } catch (Exception exception) {
+            throw new ExternalLibraryException("Parse failed");
         }
-        return new byte[] {};
     }
 }
