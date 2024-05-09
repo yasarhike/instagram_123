@@ -19,7 +19,7 @@ import org.insta.wrapper.jsonvalidator.ObjectValidator;
  * @see ReelShareDAO
  * @see ObjectValidator
  */
-public class ReelShareServiceImpl implements ReelShareService{
+public class ReelShareServiceImpl implements ReelShareService {
 
     private static ReelShareService reelShareService;
     private final ReelShareDAO reelShareDAO;
@@ -45,6 +45,7 @@ public class ReelShareServiceImpl implements ReelShareService{
     public static ReelShareService getInstance() {
         return reelShareService == null ? new ReelShareServiceImpl() : reelShareService;
     }
+
     /**
      * <p>
      * Add the people who shared the reel.

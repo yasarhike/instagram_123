@@ -1,5 +1,7 @@
 package org.insta.content.dao.reel.comment;
 
+import org.insta.content.exception.reel.reelcomment.ReelCommentFailedException;
+import org.insta.content.exception.reel.reelcomment.ReelCommentRemovalFailedException;
 import org.insta.content.model.Comment;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
@@ -67,10 +69,10 @@ public final class ReelCommentDAOImpl implements ReelCommentDAO {
                 return idSetter.setId(preparedStatement, comment);
             }
 
+            return comment.getUserId();
         } catch (final SQLException ignored) {
+            throw new ReelCommentFailedException("Reel comment failed");
         }
-
-        return comment.getUserId();
     }
 
     /**
@@ -88,10 +90,8 @@ public final class ReelCommentDAOImpl implements ReelCommentDAO {
             preparedStatement.setInt(1, commentId);
 
             return preparedStatement.executeUpdate() > 0;
-
         } catch (final SQLException ignored) {
+            throw new ReelCommentRemovalFailedException("Reel comment removal failed");
         }
-
-        return false;
     }
 }

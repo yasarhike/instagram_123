@@ -1,5 +1,7 @@
 package org.insta.content.dao.post.comment;
 
+import org.insta.content.exception.post.postcomment.PostCommentFailedException;
+import org.insta.content.exception.post.postcomment.PostUncommentFailedException;
 import org.insta.content.model.Comment;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
@@ -56,6 +58,7 @@ public final class PostCommentDAOImpl implements PostCommentDAO {
      */
     public int postComment(final Comment comment) {
         comment.setId(0);
+
         try (final PreparedStatement preparedStatement = connection.prepareStatement(String.join(" ", "INSERT INTO post_comment (post_id, commented_by, content )", "VALUES (?, ?, ?)"), Statement.RETURN_GENERATED_KEYS)) {
 
             connection.setAutoCommit(true);
@@ -66,10 +69,8 @@ public final class PostCommentDAOImpl implements PostCommentDAO {
 
             return idSetter.setId(preparedStatement, comment);
         } catch (final SQLException ignored) {
-            System.out.println("Operation failed");
+            throw new PostCommentFailedException("Post comment failed");
         }
-
-        return comment.getId();
     }
 
     /**
@@ -88,8 +89,7 @@ public final class PostCommentDAOImpl implements PostCommentDAO {
 
             return preparedStatement.executeUpdate() > 0;
         } catch (final SQLException ignored) {
+            throw new PostUncommentFailedException("Post comment removal failed");
         }
-
-        return false;
     }
 }

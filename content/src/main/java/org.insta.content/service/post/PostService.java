@@ -11,9 +11,9 @@ import org.insta.content.model.post.Post;
  * This interface provides methods for adding, removing, and retrieving posts.
  * </p>
  *
- * @see PostServiceImpl
  * @author Mohamed Yasar
  * @version 1.0, 6 Feb 2024
+ * @see PostServiceImpl
  */
 public interface PostService {
 
@@ -40,7 +40,7 @@ public interface PostService {
     /**
      * <p>
      * Retrieves a post with the specified ID.
-     *</p>
+     * </p>
      *
      * @param id the ID of the post to be retrieved
      * @return a byte array representing the retrieved post

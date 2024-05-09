@@ -1,5 +1,7 @@
 package org.insta.content.dao.reel.like;
 
+import org.insta.content.exception.reel.reellike.ReelLikeCreationFailedException;
+import org.insta.content.exception.reel.reellike.ReelLikeRemovalFailedException;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
 
@@ -62,11 +64,14 @@ public final class ReelLikeDAOImpl implements ReelLikeDAO {
             preparedStatement.setInt(2, userId);
 
             if (preparedStatement.executeUpdate() > 0) {
+
                 return idSetter.setId(preparedStatement);
             }
+
+            return 0;
         } catch (final SQLException ignored) {
+            throw new ReelLikeCreationFailedException("Reel like failed");
         }
-        return 0;
     }
 
     /**
@@ -85,10 +90,8 @@ public final class ReelLikeDAOImpl implements ReelLikeDAO {
             preparedStatement.setInt(1, id);
 
             return preparedStatement.executeUpdate() > 0;
-
         } catch (final SQLException ignored) {
+            throw new ReelLikeRemovalFailedException("Reel like removal failed");
         }
-
-        return false;
     }
 }

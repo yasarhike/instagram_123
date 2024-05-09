@@ -14,7 +14,7 @@ import org.insta.wrapper.jsonvalidator.ObjectValidator;
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
  */
-public class PostCommentServiceImpl implements PostCommentService{
+public class PostCommentServiceImpl implements PostCommentService {
 
     private static PostCommentService postCommentService;
     private final PostCommentDAO postCommentDAO;
@@ -38,7 +38,7 @@ public class PostCommentServiceImpl implements PostCommentService{
      * @return The singleton instance of PostCommentServiceImpl class.
      */
     public static PostCommentService getInstance() {
-        return postCommentService == null ? new PostCommentServiceImpl() :  postCommentService;
+        return postCommentService == null ? new PostCommentServiceImpl() : postCommentService;
     }
 
     /**

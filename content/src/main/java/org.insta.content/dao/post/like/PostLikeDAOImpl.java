@@ -1,5 +1,7 @@
 package org.insta.content.dao.post.like;
 
+import org.insta.content.exception.post.postlike.PostLikeFailedException;
+import org.insta.content.exception.post.postlike.PostUnlikeFailedException;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
 
@@ -16,7 +18,7 @@ import java.sql.Statement;
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
  */
-public final class PostLikeDAOImpl implements PostLikeDAO{
+public final class PostLikeDAOImpl implements PostLikeDAO {
 
     private static PostLikeDAOImpl postLikeDAOImpl;
     private final IdSetter idSetter;
@@ -61,9 +63,11 @@ public final class PostLikeDAOImpl implements PostLikeDAO{
             if (preparedStatement.executeUpdate() > 0) {
                 return idSetter.setId(preparedStatement);
             }
+
+            return 0;
         } catch (SQLException ignored) {
+            throw new PostLikeFailedException("Post like failed");
         }
-        return 0;
     }
 
     /**
@@ -83,8 +87,7 @@ public final class PostLikeDAOImpl implements PostLikeDAO{
             return preparedStatement.executeUpdate() > 0;
 
         } catch (SQLException ignored) {
+            throw new PostUnlikeFailedException("Post unlike failed");
         }
-
-        return false;
     }
 }

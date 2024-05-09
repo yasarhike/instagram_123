@@ -9,9 +9,9 @@ import org.insta.content.model.Comment;
  * Controller class responsible for managing comments on reels.
  * </p>
  *
- * @see ReelCommentDAO
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see ReelCommentDAO
  */
 public final class ReelCommentController {
 

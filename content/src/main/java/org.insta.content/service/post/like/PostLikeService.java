@@ -9,9 +9,9 @@ package org.insta.content.service.post.like;
  * This interface provides methods for adding and removing likes for a post.
  * </p>
  *
- * @see PostLikeServiceImpl
  * @author Mohamed Yasar
  * @version 1.0, 6 Feb 2024
+ * @see PostLikeServiceImpl
  */
 public interface PostLikeService {
 

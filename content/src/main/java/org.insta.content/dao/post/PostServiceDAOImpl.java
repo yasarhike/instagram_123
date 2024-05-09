@@ -1,5 +1,12 @@
 package org.insta.content.dao.post;
 
+import org.insta.authentication.exception.ProfileCreationFailedException;
+import org.insta.authentication.exception.ProfileUpdateFailedException;
+import org.insta.authentication.model.User;
+import org.insta.content.exception.post.PostException;
+import org.insta.content.exception.post.PostRemovalFailedException;
+import org.insta.content.exception.post.PostRetrivalFailedException;
+import org.insta.content.exception.post.PostUpdateFailedException;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
 import org.apache.logging.log4j.LogManager;
@@ -10,6 +17,7 @@ import org.insta.content.model.home.Media;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -75,11 +83,10 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
                 return idSetter.setId(preparedStatement);
             }
 
+            return 0;
         } catch (SQLException sqlException) {
-            LOGGER.debug("Operation Failed");
+            throw new ProfileCreationFailedException("Profile creation failed");
         }
-
-        return 0;
     }
 
     /**
@@ -98,11 +105,9 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
             preparedStatement.setInt(1, id);
 
             return preparedStatement.executeUpdate() > 0;
-
         } catch (final SQLException exception) {
-            LOGGER.debug("Operation failed");
+            throw new PostRemovalFailedException("Post removal failed");
         }
-        return false;
     }
 
     /**
@@ -137,7 +142,7 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
                 preparedStatement.setObject(index, list.get(index - 1));
             }
         } catch (final SQLException exception) {
-            LOGGER.debug("Update failed");
+            throw new PostUpdateFailedException("Post update failed");
         }
         return false;
     }
@@ -163,9 +168,8 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
             return setPost(resultSet, posts);
 
         } catch (final SQLException exception) {
-            LOGGER.debug("Operation failed ");
+            throw new PostRetrivalFailedException("Profile retrival failed");
         }
-        return posts;
     }
 
     /**
@@ -196,8 +200,8 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
             }
             return posts;
         } catch (final SQLException ignored) {
+            throw new PostRetrivalFailedException("Post retrival failed");
         }
-        return null;
     }
 
     /**
@@ -232,8 +236,8 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
 
             return setReelUnique(resultSet);
         } catch (Exception ignored) {
+            throw new ProfileCreationFailedException("Profile retrival failed");
         }
-        return null;
     }
 
     /**
@@ -261,6 +265,7 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
                 return post;
             }
         } catch (final SQLException ignored) {
+            throw new PostException("Resultset insertion in object failed");
         }
         return null;
     }
@@ -278,5 +283,45 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
                 " AS like_count, (SELECT COUNT(*) FROM post_comment WHERE post_comment.post_id = post.id)",
                 " AS comment_count, (SELECT COUNT(*) FROM post_share WHERE post_share.post_id = post.id) AS share_count",
                 " from post left join account on account.id = post.user_id where post.user_id = ?;");
+    }
+
+    public boolean updateProfile(final Post receivedObject) {
+        if (receivedObject.getPostId() <= 0) return false;
+
+        final Post tableObject = getPost(receivedObject.getPostId());
+        final Post updatedObject = createUpdatedObject(receivedObject, tableObject);
+
+        try (final PreparedStatement preparedStatement = connection.prepareStatement(String.join("", "UPDATE post ",
+                "SET caption = ?, is_private = ?",
+                "WHERE id = ?"))) {
+
+            connection.setAutoCommit(true);
+            preparedStatement.setString(1, updatedObject.getCaption());
+            preparedStatement.setBoolean(2, updatedObject.isPrivate());
+            preparedStatement.setInt(3, updatedObject.getPostId());
+
+            if (preparedStatement.executeUpdate() > 0) {
+                return true;
+            }
+        } catch (SQLException sqlException) {
+            throw new ProfileCreationFailedException("Profile creation failed");
+        }
+        return false;
+    }
+
+    /**
+     * <p>
+     * Updates a user profile.
+     * </p>
+     *
+     * @param receivedObject The {@link Post} object containing the updated user data.
+     * @param tableObject    Refers the current record in the storable.
+     * @return Post if the user profile is successfully updated, otherwise false.
+     */
+    public Post createUpdatedObject(final Post receivedObject, final Post tableObject) {
+        if (!Objects.isNull(receivedObject.isPrivate())) tableObject.setPrivate(receivedObject.isPrivate());
+        if (!Objects.isNull(receivedObject.getCaption())) tableObject.setCaption(receivedObject.getCaption());
+
+        return receivedObject;
     }
 }

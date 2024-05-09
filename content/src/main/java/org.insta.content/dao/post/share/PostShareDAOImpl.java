@@ -1,5 +1,7 @@
 package org.insta.content.dao.post.share;
 
+import org.insta.content.exception.post.postshare.PostShareFailedException;
+import org.insta.content.exception.post.postshare.PostUnshareFailedException;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
 
@@ -67,9 +69,11 @@ public final class PostShareDAOImpl implements PostShareDAO {
             if (preparedStatement.executeUpdate() > 0) {
                 return idSetter.setId(preparedStatement);
             }
+
+            return 0;
         } catch (SQLException ignored) {
+            throw new PostShareFailedException("Post shared failed");
         }
-        return 0;
     }
 
     /**
@@ -87,10 +91,8 @@ public final class PostShareDAOImpl implements PostShareDAO {
             preparedStatement.setInt(1, shareId);
 
             return preparedStatement.executeUpdate() > 0;
-
         } catch (SQLException ignored) {
+            throw new PostUnshareFailedException("Post unshare failed");
         }
-
-        return false;
     }
 }
