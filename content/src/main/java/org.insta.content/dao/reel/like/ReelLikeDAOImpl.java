@@ -64,6 +64,7 @@ public final class ReelLikeDAOImpl implements ReelLikeDAO {
             preparedStatement.setInt(2, userId);
 
             if (preparedStatement.executeUpdate() > 0) {
+
                 return idSetter.setId(preparedStatement);
             }
 

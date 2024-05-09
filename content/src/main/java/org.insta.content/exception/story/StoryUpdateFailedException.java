@@ -1,10 +1,19 @@
 package org.insta.content.exception.story;
 
-public final class StoryUpdateFailedException extends StoryException{
+/**
+ * <p>
+ * Exception class for handle story update.
+ * </p>
+ *
+ * @author Mohamed Yasar
+ * @version 1.0 6 Feb 2024
+ * @see StoryException
+ */
+public final class StoryUpdateFailedException extends StoryException {
 
     /**
      * <p>
-     * Constructs an InstagramException with the specified detail message.
+     * Constructs an StoryUpdateFailedException with the specified detail message.
      * </p>
      *
      * @param message Refers the exception message.

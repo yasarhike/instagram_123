@@ -56,13 +56,13 @@ public final class UserAccountServiceImplementation implements UserAccountServic
     public byte[] createProfile(final User user) {
         final byte[] violations = objectValidator.validate(user, UserCredentialsValidator.class);
 
-        if (violations.length > 0) return violations;
-
+        if (violations.length > 0) {
+            return violations;
+        }
         final List<String> invalidCredentials = userAccountDAO.getCredentialsInvalidList(user);
 
-        if (!invalidCredentials.isEmpty()) return objectValidator.objectResponse(invalidCredentials);
-
-        return objectValidator.forSuccessResponse(userAccountDAO.createProfile(user), violations);
+        return !invalidCredentials.isEmpty() ? objectValidator.objectResponse(invalidCredentials) :
+                objectValidator.forSuccessResponse(userAccountDAO.createProfile(user), violations);
     }
 
     /**
@@ -77,7 +77,6 @@ public final class UserAccountServiceImplementation implements UserAccountServic
         return objectValidator.objectResponse(userAccountDAO.getProfile(id));
     }
 
-
     /**
      * <p>
      * Updates an existing user profile.
@@ -89,7 +88,9 @@ public final class UserAccountServiceImplementation implements UserAccountServic
     public byte[] updateProfile(final User user) {
         final byte[] violations = objectValidator.validate(user, UserCredentialsValidator.class);
 
-        if (violations.length > 0) return violations;
+        if (violations.length > 0) {
+            return violations;
+        }
 
         return objectValidator.manualResponse(userAccountDAO.updateProfile(user));
     }

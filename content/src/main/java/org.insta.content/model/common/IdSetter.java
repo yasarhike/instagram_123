@@ -1,5 +1,7 @@
 package org.insta.content.model.common;
 
+import org.insta.content.exception.FetchDataFailedException;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,12 +52,12 @@ public final class IdSetter {
         try (final ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
             if (resultSet.next()) {
                 object.setId(resultSet.getInt("id"));
-
-                return object.getId();
             }
+
+            return object.getId();
         } catch (SQLException ignored) {
+            throw new FetchDataFailedException("Data fetch failed");
         }
-        return object.getId();
     }
 
     /**
@@ -69,10 +71,13 @@ public final class IdSetter {
     public int setId(final PreparedStatement preparedStatement) {
         try (final ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
             if (resultSet.next()) {
+
                 return resultSet.getInt("id");
             }
+
+            return 0;
         } catch (SQLException ignored) {
+            throw new FetchDataFailedException("Data fetch failed");
         }
-        return 0;
     }
 }

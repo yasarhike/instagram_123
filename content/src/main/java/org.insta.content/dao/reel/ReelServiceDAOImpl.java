@@ -74,6 +74,7 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
 
             if (preparedStatement.executeUpdate() > 0) {
                 reel.setReelId(idSetter.setId(preparedStatement));
+
                 return reel.getReelId();
             }
 
@@ -161,8 +162,8 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
 
             preparedStatement.setInt(1, userId);
             final ResultSet resultSet = preparedStatement.executeQuery();
-            return setReel(reels, resultSet);
 
+            return setReel(reels, resultSet);
         } catch (final SQLException exception) {
             throw new ReelRetrivalFailedException("Reel retrival failed");
         }
@@ -193,6 +194,7 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
                 reel.setTotal_shares(resultSet.getInt(10));
                 reels.add(reel);
             }
+
             return reels;
         } catch (final SQLException exception) {
             throw new ReelRetrivalFailedException("Reel retrival failed");
@@ -230,9 +232,9 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
                 reel.setReelId(resultSet.getInt("id"));
 
                 return true;
-            } else {
-                return false;
             }
+
+            return false;
         } catch (SQLException ignored) {
             throw new ReelException("Resultset insertion in local object failed exception");
         }

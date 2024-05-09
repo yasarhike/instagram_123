@@ -65,6 +65,7 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
             preparedStatement.setInt(5, story.getMedia().getId());
 
             if (preparedStatement.executeUpdate() > 0) {
+
                 return idSetter.setId(preparedStatement);
             }
 

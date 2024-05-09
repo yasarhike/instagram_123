@@ -88,8 +88,8 @@ public final class ReelShareDAOImpl implements ReelShareDAO {
 
             connection.setAutoCommit(true);
             preparedStatement.setInt(1, id);
-            return preparedStatement.executeUpdate() > 0;
 
+            return preparedStatement.executeUpdate() > 0;
         } catch (final SQLException ignored) {
             throw new PostUnshareFailedException("Reel unshare failed exception");
         }

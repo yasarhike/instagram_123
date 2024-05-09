@@ -1,6 +1,8 @@
 package org.insta.content.dao.post;
 
 import org.insta.authentication.exception.ProfileCreationFailedException;
+import org.insta.authentication.exception.ProfileUpdateFailedException;
+import org.insta.authentication.model.User;
 import org.insta.content.exception.post.PostException;
 import org.insta.content.exception.post.PostRemovalFailedException;
 import org.insta.content.exception.post.PostRetrivalFailedException;
@@ -15,6 +17,7 @@ import org.insta.content.model.home.Media;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -280,5 +283,45 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
                 " AS like_count, (SELECT COUNT(*) FROM post_comment WHERE post_comment.post_id = post.id)",
                 " AS comment_count, (SELECT COUNT(*) FROM post_share WHERE post_share.post_id = post.id) AS share_count",
                 " from post left join account on account.id = post.user_id where post.user_id = ?;");
+    }
+
+    public boolean updateProfile(final Post receivedObject) {
+        if (receivedObject.getPostId() <= 0) return false;
+
+        final Post tableObject = getPost(receivedObject.getPostId());
+        final Post updatedObject = createUpdatedObject(receivedObject, tableObject);
+
+        try (final PreparedStatement preparedStatement = connection.prepareStatement(String.join("", "UPDATE post ",
+                "SET caption = ?, is_private = ?",
+                "WHERE id = ?"))) {
+
+            connection.setAutoCommit(true);
+            preparedStatement.setString(1, updatedObject.getCaption());
+            preparedStatement.setBoolean(2, updatedObject.isPrivate());
+            preparedStatement.setInt(3, updatedObject.getPostId());
+
+            if (preparedStatement.executeUpdate() > 0) {
+                return true;
+            }
+        } catch (SQLException sqlException) {
+            throw new ProfileCreationFailedException("Profile creation failed");
+        }
+        return false;
+    }
+
+    /**
+     * <p>
+     * Updates a user profile.
+     * </p>
+     *
+     * @param receivedObject The {@link Post} object containing the updated user data.
+     * @param tableObject    Refers the current record in the storable.
+     * @return Post if the user profile is successfully updated, otherwise false.
+     */
+    public Post createUpdatedObject(final Post receivedObject, final Post tableObject) {
+        if (!Objects.isNull(receivedObject.isPrivate())) tableObject.setPrivate(receivedObject.isPrivate());
+        if (!Objects.isNull(receivedObject.getCaption())) tableObject.setCaption(receivedObject.getCaption());
+
+        return receivedObject;
     }
 }

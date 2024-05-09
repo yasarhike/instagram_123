@@ -18,7 +18,7 @@ import org.insta.wrapper.jsonvalidator.ObjectValidator;
  * @see ReelLikeDAOImpl
  * @see ObjectValidator
  */
-public class ReelLikeServiceImpl {
+public class ReelLikeServiceImpl implements ReelLikeService{
 
     private static ReelLikeServiceImpl reelLikeService;
     private final ReelLikeDAOImpl reelLikeDAOImpl;

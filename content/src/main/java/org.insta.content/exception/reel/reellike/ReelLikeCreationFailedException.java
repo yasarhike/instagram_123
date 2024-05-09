@@ -1,12 +1,22 @@
 package org.insta.content.exception.reel.reellike;
 
+import org.insta.content.exception.reel.ReelException;
 import org.insta.exception.InstagramException;
 
+/**
+ * <p>
+ * Exception class for handle reel like.
+ * </p>
+ *
+ * @author Mohamed Yasar
+ * @version 1.0 6 Feb 2024
+ * @see ReelException
+ */
 public final class ReelLikeCreationFailedException extends InstagramException {
 
     /**
      * <p>
-     * Constructs an InstagramException with the specified detail message.
+     * Constructs an ReelLikeCreationFailedException with the specified detail message.
      * </p>
      *
      * @param message Refers the exception message.

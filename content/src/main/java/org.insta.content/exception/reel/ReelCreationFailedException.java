@@ -1,10 +1,19 @@
 package org.insta.content.exception.reel;
 
-public final class ReelCreationFailedException extends ReelException{
+/**
+ * <p>
+ * Exception class for manage reel creation.
+ * </p>
+ *
+ * @author Mohamed Yasar
+ * @version 1.0 6 Feb 2024
+ * @see ReelException
+ */
+public final class ReelCreationFailedException extends ReelException {
 
     /**
      * <p>
-     * Constructs an InstagramException with the specified detail message.
+     * Constructs an ReelCreationFailedException with the specified detail message.
      * </p>
      *
      * @param message Refers the exception message.
