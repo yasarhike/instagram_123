@@ -2,10 +2,13 @@ package org.insta.databaseconnection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.insta.databaseconnection.exception.DatabaseConnectionFailedException;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -53,13 +56,12 @@ public final class DatabaseConnection {
 
                 connection = DriverManager.getConnection(properties.getProperty("url"), properties.getProperty("username"), properties.getProperty("password"));
 
-                LOGGER.info("Database is connected");
-            } catch (final Exception exception) {
-                if (LOGGER != null) {
-                    LOGGER.error("Database Connection failed");
-                }
+                return connection;
+            } catch (ClassNotFoundException | SQLException | IOException exception) {
+                if (LOGGER != null)  LOGGER.error("Database Connection failed");
+
+                throw new DatabaseConnectionFailedException("Database connection failed");
             }
-            return connection;
         }
         return connection;
     }

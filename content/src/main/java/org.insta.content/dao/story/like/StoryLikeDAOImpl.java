@@ -1,5 +1,7 @@
 package org.insta.content.dao.story.like;
 
+import org.insta.content.exception.story.storylike.StoryLikeCreationFailedException;
+import org.insta.content.exception.story.storylike.StoryLikeRemovalFailedException;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
 
@@ -13,9 +15,9 @@ import java.sql.Statement;
  * Managing user story like.
  * </p>
  *
- * @see StoryLikeDAO
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see StoryLikeDAO
  */
 public final class StoryLikeDAOImpl implements StoryLikeDAO {
 
@@ -65,10 +67,10 @@ public final class StoryLikeDAOImpl implements StoryLikeDAO {
                 return idSetter.setId(preparedStatement);
             }
 
+            return 0;
         } catch (final SQLException ignored) {
+            throw new StoryLikeCreationFailedException("story like creation failed");
         }
-
-        return 0;
     }
 
     /**
@@ -87,10 +89,8 @@ public final class StoryLikeDAOImpl implements StoryLikeDAO {
             preparedStatement.setInt(1, storyId);
 
             return preparedStatement.executeUpdate() > 0;
-
         } catch (final SQLException ignored) {
+            throw new StoryLikeRemovalFailedException("Story like removal failed");
         }
-
-        return false;
     }
 }

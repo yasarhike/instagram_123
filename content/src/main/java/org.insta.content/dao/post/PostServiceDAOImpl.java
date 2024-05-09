@@ -1,5 +1,10 @@
 package org.insta.content.dao.post;
 
+import org.insta.authentication.exception.ProfileCreationFailedException;
+import org.insta.content.exception.post.PostException;
+import org.insta.content.exception.post.PostRemovalFailedException;
+import org.insta.content.exception.post.PostRetrivalFailedException;
+import org.insta.content.exception.post.PostUpdateFailedException;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
 import org.apache.logging.log4j.LogManager;
@@ -75,11 +80,10 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
                 return idSetter.setId(preparedStatement);
             }
 
+            return 0;
         } catch (SQLException sqlException) {
-            LOGGER.debug("Operation Failed");
+            throw new ProfileCreationFailedException("Profile creation failed");
         }
-
-        return 0;
     }
 
     /**
@@ -98,11 +102,9 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
             preparedStatement.setInt(1, id);
 
             return preparedStatement.executeUpdate() > 0;
-
         } catch (final SQLException exception) {
-            LOGGER.debug("Operation failed");
+            throw new PostRemovalFailedException("Post removal failed");
         }
-        return false;
     }
 
     /**
@@ -137,7 +139,7 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
                 preparedStatement.setObject(index, list.get(index - 1));
             }
         } catch (final SQLException exception) {
-            LOGGER.debug("Update failed");
+            throw new PostUpdateFailedException("Post update failed");
         }
         return false;
     }
@@ -163,9 +165,8 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
             return setPost(resultSet, posts);
 
         } catch (final SQLException exception) {
-            LOGGER.debug("Operation failed ");
+            throw new PostRetrivalFailedException("Profile retrival failed");
         }
-        return posts;
     }
 
     /**
@@ -196,8 +197,8 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
             }
             return posts;
         } catch (final SQLException ignored) {
+            throw new PostRetrivalFailedException("Post retrival failed");
         }
-        return null;
     }
 
     /**
@@ -232,8 +233,8 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
 
             return setReelUnique(resultSet);
         } catch (Exception ignored) {
+            throw new ProfileCreationFailedException("Profile retrival failed");
         }
-        return null;
     }
 
     /**
@@ -261,6 +262,7 @@ public final class PostServiceDAOImpl implements PostServiceDAO {
                 return post;
             }
         } catch (final SQLException ignored) {
+            throw new PostException("Resultset insertion in object failed");
         }
         return null;
     }

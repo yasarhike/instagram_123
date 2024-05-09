@@ -120,5 +120,4 @@ public final class Post extends Common {
     public void setUserName(final String userName) {
         this.userName = userName;
     }
-
 }

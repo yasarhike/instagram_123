@@ -16,11 +16,11 @@ public final class HashTagDAO {
         connection = DatabaseConnection.get();
     }
 
-    public static HashTagDAO getInstance(){
+    public static HashTagDAO getInstance() {
         return hashTag == null ? hashTag = new HashTagDAO() : hashTag;
     }
 
-    public void insertHashtags(final List <String> hashtags) {
+    public void insertHashtags(final List<String> hashtags) {
 
         try (final PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO hash_tag (hash_tag) VALUES (?) ON CONFLICT DO NOTHING"

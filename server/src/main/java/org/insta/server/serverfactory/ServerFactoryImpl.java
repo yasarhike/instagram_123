@@ -28,12 +28,11 @@ import java.util.List;
  * This class follows the Singleton pattern to ensure only one instance exists throughout the application.
  * </p>
  *
+ * @author Mohamed Yasar
+ * @version 1.0 6 Feb 2024
  * @see ServerFactory
  * @see JAXRSServerFactoryBean
  * @see JacksonJsonProvider
- *
- * @author Mohamed Yasar
- * @version 1.0 6 Feb 2024
  */
 public final class ServerFactoryImpl implements ServerFactory {
 

@@ -1,5 +1,9 @@
 package org.insta.content.dao.story;
 
+import org.insta.content.exception.story.StoryCreationFailedException;
+import org.insta.content.exception.story.StoryException;
+import org.insta.content.exception.story.StoryRemovalFailedException;
+import org.insta.content.exception.story.StoryRetrivalFailedException;
 import org.insta.content.model.common.IdSetter;
 import org.insta.content.model.story.Story;
 import org.insta.databaseconnection.DatabaseConnection;
@@ -64,9 +68,10 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
                 return idSetter.setId(preparedStatement);
             }
 
+            return 0;
         } catch (final SQLException ignored) {
+            throw new StoryCreationFailedException("Story creation failed");
         }
-        return 0;
     }
 
     /**
@@ -85,11 +90,9 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
             preparedStatement.setInt(1, id);
 
             return preparedStatement.executeUpdate() > 0;
-
         } catch (final SQLException exception) {
-            logger.debug("Operation failed");
+            throw new StoryRemovalFailedException("Story removal failed");
         }
-        return false;
     }
 
     /**
@@ -110,10 +113,9 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
             preparedStatement.setInt(1, id);
 
             return setStoryUnique(story, preparedStatement.executeQuery());
-
         } catch (final SQLException exception) {
+            throw new StoryRetrivalFailedException("Story retrival failed");
         }
-        return null;
     }
 
     /**
@@ -137,11 +139,12 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
                 story.setTimestamp(resultSet.getTimestamp(7));
                 story.setTotalLikes(resultSet.getInt(8));
                 story.setTotalShares(resultSet.getInt(9));
-                return story;
             }
+
+            return story;
         } catch (final SQLException exception) {
+            throw new StoryException("Resultset insert failed exception");
         }
-        return null;
     }
 
     /**
@@ -164,9 +167,8 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
             return setStory(resultSet, reels);
 
         } catch (final SQLException exception) {
-            logger.debug("Operation failed ");
+            throw new StoryRetrivalFailedException("Story retrival failed");
         }
-        return reels;
     }
 
     /**
@@ -193,11 +195,11 @@ public final class StoryServiceDAOImpl implements StoryServiceDAO {
                 story.setTotalShares(resultSet.getInt(9));
                 storys.add(story);
             }
+
             return storys;
         } catch (final SQLException exception) {
-            logger.debug("Operation Failed");
+            throw new StoryException("Resultset insert failed");
         }
-        return storys;
     }
 
     /**

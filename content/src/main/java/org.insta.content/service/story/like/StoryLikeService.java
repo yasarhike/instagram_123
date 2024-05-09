@@ -3,7 +3,7 @@ package org.insta.content.service.story.like;
 /**
  * <p>
  * Service interface for managing story liking operations.
- *</p>
+ * </p>
  *
  * <p>
  * This interface declares methods to like and unlike stories.
@@ -20,7 +20,7 @@ public interface StoryLikeService {
      * Adds a like for the particular story.
      * </p>
      *
-     * @param userId The ID of the user liking the story.
+     * @param userId  The ID of the user liking the story.
      * @param storyId The ID of the story to like.
      * @return A byte array representing a success response.
      */

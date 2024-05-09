@@ -19,7 +19,7 @@ import org.insta.wrapper.jsonvalidator.ObjectValidator;
  * @see StoryLikeDAO
  * @see ObjectValidator
  */
-public final class StoryLikeServiceImpl implements StoryLikeService{
+public final class StoryLikeServiceImpl implements StoryLikeService {
 
     private static StoryLikeServiceImpl storyLikeService;
     private final StoryLikeDAO storyLikeDAO;
@@ -52,7 +52,7 @@ public final class StoryLikeServiceImpl implements StoryLikeService{
      * Adds a like for the particular story.
      * </p>
      *
-     * @param userId The ID of the user liking the story.
+     * @param userId  The ID of the user liking the story.
      * @param storyId The ID of the story to like.
      * @return A byte array representing a success response.
      */

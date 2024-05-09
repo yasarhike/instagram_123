@@ -9,7 +9,15 @@
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/Instagram-org-feature/pom.xml" />
+        <option value="$PROJECT_DIR$/authentication/pom.xml" />
+        <option value="$PROJECT_DIR$/consolescanner/pom.xml" />
+        <option value="$PROJECT_DIR$/database-sync/pom.xml" />
+        <option value="$PROJECT_DIR$/exp-feature/pom.xml" />
         <option value="$PROJECT_DIR$/main/pom.xml" />
+        <option value="$PROJECT_DIR$/server-sync/pom.xml" />
+        <option value="$PROJECT_DIR$/serversync/pom.xml" />
+        <option value="$PROJECT_DIR$/wrapper/pom.xml" />
       </set>
     </option>
   </component>

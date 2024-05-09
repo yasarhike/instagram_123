@@ -1,5 +1,7 @@
 package org.insta.content.dao.reel.share;
 
+import org.insta.content.exception.post.postshare.PostUnshareFailedException;
+import org.insta.content.exception.reel.reelshare.ReelShareFailedException;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
 
@@ -65,9 +67,10 @@ public final class ReelShareDAOImpl implements ReelShareDAO {
                 return idSetter.setId(preparedStatement);
             }
 
+            return 0;
         } catch (final SQLException ignored) {
+            throw new ReelShareFailedException("Reel share failed exception");
         }
-        return 0;
     }
 
     /**
@@ -88,7 +91,7 @@ public final class ReelShareDAOImpl implements ReelShareDAO {
             return preparedStatement.executeUpdate() > 0;
 
         } catch (final SQLException ignored) {
+            throw new PostUnshareFailedException("Reel unshare failed exception");
         }
-        return false;
     }
 }

@@ -1,6 +1,5 @@
 package org.insta.content.controller.reel.like;
 
-import org.insta.content.service.reel.like.ReelLikeService;
 import org.insta.content.service.reel.like.ReelLikeServiceImpl;
 
 import javax.ws.rs.*;
@@ -17,13 +16,13 @@ import javax.ws.rs.core.MediaType;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
- * @see ReelLikeService
+ * @see ReelLikeServiceImpl
  */
 @Path("/reellike")
 public final class ReelLikeControllerRest {
 
     private static ReelLikeControllerRest reelLikeControllerRest;
-    private final ReelLikeService reelLikeService;
+    private final ReelLikeServiceImpl reelLikeService;
 
     /**
      * <p>

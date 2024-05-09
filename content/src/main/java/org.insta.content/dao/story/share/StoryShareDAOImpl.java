@@ -1,6 +1,8 @@
 package org.insta.content.dao.story.share;
 
 import org.insta.content.dao.story.querybuilder.QueryBuilder;
+import org.insta.content.exception.story.storyshare.StoryShareFailedException;
+import org.insta.content.exception.story.storyshare.StoryShareRemovalFailedException;
 import org.insta.content.model.common.IdSetter;
 import org.insta.databaseconnection.DatabaseConnection;
 
@@ -68,9 +70,11 @@ public class StoryShareDAOImpl implements StoryShareDAO {
             if (preparedStatement.executeUpdate() > 0) {
                 return idSetter.setId(preparedStatement);
             }
+
+            return 0;
         } catch (final SQLException ignored) {
+            throw new StoryShareFailedException("Story share failed");
         }
-        return 0;
     }
 
     /**
@@ -91,7 +95,7 @@ public class StoryShareDAOImpl implements StoryShareDAO {
 
             return preparedStatement.executeUpdate() > 0;
         } catch (final SQLException ignored) {
+            throw new StoryShareRemovalFailedException("Story share remove failed");
         }
-        return false;
     }
 }

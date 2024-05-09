@@ -14,13 +14,13 @@ import org.insta.wrapper.jsonvalidator.ObjectValidator;
  *
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
- * @see ReelLikeService
+ * @see ReelLikeServiceImpl
  * @see ReelLikeDAOImpl
  * @see ObjectValidator
  */
-public class ReelLikeServiceImpl implements ReelLikeService{
+public class ReelLikeServiceImpl {
 
-    private static ReelLikeService reelLikeService;
+    private static ReelLikeServiceImpl reelLikeService;
     private final ReelLikeDAOImpl reelLikeDAOImpl;
     private final ObjectValidator objectValidator;
 
@@ -41,20 +41,19 @@ public class ReelLikeServiceImpl implements ReelLikeService{
      *
      * @return The singleton instance of ReelLikeServiceImpl class.
      */
-    public static ReelLikeService getInstance() {
+    public static ReelLikeServiceImpl getInstance() {
         return reelLikeService == null ? new ReelLikeServiceImpl() : reelLikeService;
     }
 
     /**
      * <p>
-     * Add a like for the particular reel.
+     * Remove a like for the particular reel.
      * </p>
      *
-     * @param reelId Refers to the ID of the reel.
-     * @param userId Refers to the ID of the user.
+     * @param reelId Refers to the id of the reel.
+     * @param userId Refers to the id of the user.
      * @return A byte array representing the result of the operation.
      */
-    @Override
     public byte[] reelLike(int reelId, int userId) {
         return objectValidator.forSuccessResponse(reelLikeDAOImpl.reelLike(reelId, userId), new byte[]{});
     }
@@ -67,7 +66,7 @@ public class ReelLikeServiceImpl implements ReelLikeService{
      * @param id Refers to the ID of the user.
      * @return A byte array representing the result of the operation.
      */
-    @Override
+
     public byte[] reelUnlike(int id) {
         return objectValidator.manualResponse(reelLikeDAOImpl.reelUnlike(id));
     }

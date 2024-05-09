@@ -9,12 +9,12 @@ import org.insta.wrapper.jsonvalidator.ObjectValidator;
  * Managing user post like.
  * </p>
  *
- * @see ObjectValidator
- * @see PostLikeDAO
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
+ * @see ObjectValidator
+ * @see PostLikeDAO
  */
-public final class PostLikeServiceImpl implements PostLikeService{
+public final class PostLikeServiceImpl implements PostLikeService {
 
     private static PostLikeService postLikeService;
     private final PostLikeDAO postLikeDAO;

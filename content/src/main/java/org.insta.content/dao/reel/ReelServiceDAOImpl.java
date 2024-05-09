@@ -1,6 +1,7 @@
 package org.insta.content.dao.reel;
 
 import org.insta.content.dao.reel.query.QueryGenerator;
+import org.insta.content.exception.reel.*;
 import org.insta.content.model.common.IdSetter;
 import org.insta.content.model.reel.Reel;
 import org.insta.databaseconnection.DatabaseConnection;
@@ -19,6 +20,9 @@ import java.util.List;
  * @author Mohamed Yasar
  * @version 1.0 6 Feb 2024
  * @see ReelServiceDAO
+ * @see IdSetter
+ * @see QueryGenerator
+ * @see DatabaseConnection
  */
 public final class ReelServiceDAOImpl implements ReelServiceDAO {
 
@@ -72,9 +76,11 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
                 reel.setReelId(idSetter.setId(preparedStatement));
                 return reel.getReelId();
             }
+
+            return 0;
         } catch (SQLException ignored) {
+            throw new ReelCreationFailedException("Reel creation failed");
         }
-        return 0;
     }
 
     /**
@@ -94,9 +100,8 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
 
             return preparedStatement.executeUpdate() > 0;
         } catch (final SQLException ignored) {
+            throw new ReelRemovalFailedException("Reel removal failed");
         }
-
-        return false;
     }
 
     /**
@@ -119,10 +124,8 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
 
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException exception) {
-            LOGGER.debug("Update failed");
+            throw new ReelUpdateFailedException("Reel update failed");
         }
-
-        return false;
     }
 
     /**
@@ -161,9 +164,8 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
             return setReel(reels, resultSet);
 
         } catch (final SQLException exception) {
-            LOGGER.debug("Operation failed ");
+            throw new ReelRetrivalFailedException("Reel retrival failed");
         }
-        return reels;
     }
 
     /**
@@ -193,9 +195,8 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
             }
             return reels;
         } catch (final SQLException exception) {
-            LOGGER.debug("Operation failed");
+            throw new ReelRetrivalFailedException("Reel retrival failed");
         }
-        return reels;
     }
 
     /**
@@ -233,8 +234,8 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
                 return false;
             }
         } catch (SQLException ignored) {
+            throw new ReelException("Resultset insertion in local object failed exception");
         }
-        return false;
     }
 
     /**
@@ -254,8 +255,8 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
 
             return setReelUnique(reel, resultSet);
         } catch (Exception ignored) {
+            throw new ReelRetrivalFailedException("Reel retrival failed");
         }
-        return null;
     }
 
     /**
@@ -280,12 +281,12 @@ public final class ReelServiceDAOImpl implements ReelServiceDAO {
                 reel.setTotal_likes(resultSet.getInt(8));
                 reel.setTotal_comment(resultSet.getInt(9));
                 reel.setTotal_shares(resultSet.getInt(10));
-                return reel;
             }
-        } catch (Exception ignored) {
-        }
 
-        return null;
+            return reel;
+        } catch (Exception ignored) {
+            throw new ReelException("Resultset insertion in object failed exception");
+        }
     }
 
     /**
